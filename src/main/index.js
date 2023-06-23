@@ -19,7 +19,7 @@ function createWindow() {
       sandbox: false
     }
   })
-  // mainWindow.maximize()
+  mainWindow.maximize()
   mainWindow.on('ready-to-show', async () => {
     mainWindow.show()
   })
@@ -73,6 +73,8 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('check-user', (e, args) => {
-  e.reply('validated-user', args)
+ipcMain.on('check-user', async (e, args) => {
+  const user = await Users.findOne({ name: args.name, pwd: args.pwd })
+
+  e.reply('validated-user', user)
 })

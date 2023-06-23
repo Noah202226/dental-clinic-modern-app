@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.electron.dental.clinic.app
 productName: dental-clinic-modern-app
 directories:
   buildResources: build
