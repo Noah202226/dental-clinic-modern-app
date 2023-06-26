@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 
 // Mongodb
 import db from './mongoConnection'
-import { NewPatient, NewSale, Users } from './shemas'
+import { InstallmentPatient, NewPatient, NewSale, Users } from './shemas'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -124,7 +124,7 @@ ipcMain.on('patients-records', async (e, args) => {
   const patients = await NewPatient.find({})
   e.reply('patients', JSON.stringify(patients))
 })
-// Get all patients
+// Get sales for patient
 ipcMain.on('get-sales-record', async (e, args) => {
   console.log(args)
   const patients = await NewSale.find({ patientName: args })
@@ -164,6 +164,37 @@ ipcMain.on('update-patient-info', async (e, args) => {
     // Handle any success messages or redirects
 
     e.reply('patient-updated', 'patient info updated .')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+//New Installment Patient
+// Get all patients
+ipcMain.on('installment-patient-records', async (e, args) => {
+  const patients = await InstallmentPatient.find({})
+  e.reply('installment-patients', JSON.stringify(patients))
+})
+
+// Get installment patient info
+ipcMain.on('get-installment-patient-info', async (e, args) => {
+  const installmentPatientData = await InstallmentPatient.findOne({ _id: args })
+
+  e.reply('installment-patient-info', JSON.stringify(installmentPatientData))
+})
+ipcMain.on('new-installment-patient', async (e, args) => {
+  console.log(args)
+
+  const newInstallmentPatient = new InstallmentPatient(args)
+
+  try {
+    await newInstallmentPatient.save()
+    // await newPatient2.save()
+    console.log('Installment Patient Saved successfully!')
+    // Handle any success messages or redirects
+
+    e.reply('installment-patient-saved', 'patient info updated .')
   } catch (error) {
     console.error('Error saving user:', error)
     // Handle any error messages or error handling

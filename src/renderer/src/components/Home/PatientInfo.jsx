@@ -431,6 +431,28 @@ const PatientInfo = ({ patients }) => {
         style={{ position: 'relative', zIndex: 9999999, width: 1350, height: 700 }}
       >
         <Grid container>
+          <Grid item xs={5}>
+            <Typography variant="h4">Patient Transactions</Typography>
+            <Typography variant="h6">No. of transaction : {patientTransactions.length}</Typography>
+
+            {patientTransactions.map((tx) => (
+              <Card key={tx._id}>
+                <Typography variant="h6" fontSize={15}>
+                  Date:{' '}
+                  {new Date(tx.dateTransact).toLocaleString(undefined, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+                <Typography variant="h6" fontSize={14}>
+                  Amount: {tx.amountPaid}
+                </Typography>
+              </Card>
+            ))}
+          </Grid>
+
           <Grid item xs={7}>
             <Stack
               flexDirection={'row'}
@@ -697,28 +719,6 @@ const PatientInfo = ({ patients }) => {
                 </FormControl>
               </Stack>
             </Card>
-          </Grid>
-
-          <Grid item xs={5}>
-            <Typography variant="h4">Patient Transactions</Typography>
-            <Typography variant="h6">No. of transaction : {patientTransactions.length}</Typography>
-
-            {patientTransactions.map((tx) => (
-              <Card key={tx._id}>
-                <Typography variant="h6" fontSize={15}>
-                  Date:{' '}
-                  {new Date(tx.dateTransact).toLocaleString(undefined, {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </Typography>
-                <Typography variant="h6" fontSize={14}>
-                  Amount: {tx.amountPaid}
-                </Typography>
-              </Card>
-            ))}
           </Grid>
         </Grid>
       </dialog>

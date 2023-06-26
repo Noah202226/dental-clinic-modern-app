@@ -10,9 +10,11 @@ const Home = () => {
   const ipcRenderer = window.ipcRenderer
 
   const [patientsRecord, setPatientsRecord] = useState([])
+  const [installmentPatients, setInstallmentPatients] = useState([])
 
   useEffect(() => {
     ipcRenderer.send('patients-records')
+    ipcRenderer.send('installment-patient-records')
 
     ipcRenderer.on('patients', (e, args) => {
       const data = JSON.parse(args)
@@ -21,6 +23,17 @@ const Home = () => {
 
       data.forEach((doc) => {
         setPatientsRecord((prevDocuments) => [...prevDocuments, doc])
+      })
+    })
+
+    ipcRenderer.on('installment-patients', (e, args) => {
+      const data = JSON.parse(args)
+      console.log(data)
+
+      setInstallmentPatients([])
+
+      data.forEach((doc) => {
+        setInstallmentPatients((prevDocuments) => [...prevDocuments, doc])
       })
     })
   }, [])
@@ -41,7 +54,7 @@ const Home = () => {
 
       <Grid container spacing={1} p={1}>
         <Grid item xs={6}>
-          <PatientList />
+          <PatientList patients={installmentPatients} />
         </Grid>
 
         <Grid item xs={6}>

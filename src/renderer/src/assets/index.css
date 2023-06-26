@@ -27,3 +27,7 @@ dialog {
 .MuiSelect-select {
   z-index: 99999999 !important;
 }
+
+.capitalize > :nth-child(2) > :nth-child(1) {
+  text-transform: capitalize;
+}
