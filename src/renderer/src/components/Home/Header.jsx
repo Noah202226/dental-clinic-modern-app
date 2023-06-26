@@ -32,7 +32,7 @@ const Header = () => {
     }, 1000)
   }, [])
   return (
-    <Box>
+    <Box sx={{ mb: 3 }}>
       <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} p={1}>
         <Stack
           flexDirection={'row'}

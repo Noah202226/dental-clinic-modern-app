@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -20,6 +20,10 @@ const Login = ({ setIsLogin }) => {
     setIsLoading(true)
   }
 
+  const exitApp = () => {
+    ipcRenderer.send('exit-app')
+  }
+
   useEffect(() => {
     ipcRenderer.on('validated-user', (e, args) => {
       console.log(args)
@@ -34,18 +38,41 @@ const Login = ({ setIsLogin }) => {
         setIsLoading(false)
       }
     })
+
+    setTimeout(() => {
+      userRef.current.children[1].children[0].focus()
+    }, 2000)
   }, [])
 
   return (
-    <Box>
-      <Typography>Login Page</Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'space-around'
+        }}
+      >
+        <Typography>Login Page</Typography>
 
-      <TextField type="text" label="Username" ref={userRef} disabled={isLoading} />
-      <TextField type="password" label="Password" ref={pwdRef} disabled={isLoading} />
+        <TextField type="text" label="Username" ref={userRef} disabled={isLoading} fullWidth />
+        <TextField type="password" label="Password" ref={pwdRef} disabled={isLoading} fullWidth />
 
-      <Button onClick={checkUser}>Login</Button>
+        <Stack
+          width={'100%'}
+          flexDirection={'row'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={2}
+        >
+          <Button variant="contained" onClick={checkUser} color="success" sx={{ width: '100%' }}>
+            Login
+          </Button>
+        </Stack>
 
-      <ToastContainer />
+        <ToastContainer />
+      </Box>
     </Box>
   )
 }

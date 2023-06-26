@@ -1,11 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 // Mongodb
 import db from './mongoConnection'
-import { Users } from './shemas'
+import { NewPatient, NewSale, Users } from './shemas'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -27,6 +27,15 @@ function createWindow() {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  mainWindow.on('close', (event) => {
+    // Prevent the window from quitting immediately
+    event.preventDefault()
+
+    console.log('close button clicked')
+
+    mainWindow.webContents.send('closing-app', 'data')
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -77,4 +86,91 @@ ipcMain.on('check-user', async (e, args) => {
   const user = await Users.findOne({ name: args.name, pwd: args.pwd })
 
   e.reply('validated-user', user)
+})
+
+ipcMain.on('new-patient-record', async (e, args) => {
+  console.log(args)
+
+  const newPatient = new NewPatient(args)
+
+  try {
+    await newPatient.save()
+    // await newPatient2.save()
+    console.log('User saved successfully!')
+    // Handle any success messages or redirects
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// New Sale
+ipcMain.on('new-sale-record', async (e, args) => {
+  const newSale = new NewSale(args)
+
+  try {
+    await newSale.save()
+    // await newPatient2.save()
+    console.log('User saved successfully!')
+    // Handle any success messages or redirects
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Get all patients
+ipcMain.on('patients-records', async (e, args) => {
+  const patients = await NewPatient.find({})
+  e.reply('patients', JSON.stringify(patients))
+})
+// Get all patients
+ipcMain.on('get-sales-record', async (e, args) => {
+  console.log(args)
+  const patients = await NewSale.find({ patientName: args })
+  e.reply('sales-record', JSON.stringify(patients))
+})
+
+// Get patient Info
+ipcMain.on('get-patient-info', async (e, args) => {
+  const patientData = await NewPatient.findOne({ _id: args })
+
+  e.reply('patient-info', JSON.stringify(patientData))
+})
+
+ipcMain.on('delete-patient', async (e, args) => {
+  console.log(args)
+  try {
+    await NewPatient.findByIdAndDelete(args)
+    // await newPatient2.save()
+    console.log('Patient Deleted successfully!')
+    // Handle any success messages or redirects
+
+    e.reply('patient-deleted', 'delete now.')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Update patient Info
+ipcMain.on('update-patient-info', async (e, args) => {
+  console.log(args.id, args.updatedData)
+
+  try {
+    await NewPatient.findByIdAndUpdate(args.id, args.updatedData)
+    // await newPatient2.save()
+    console.log('Patient updated successfully!')
+    // Handle any success messages or redirects
+
+    e.reply('patient-updated', 'patient info updated .')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Exit app
+ipcMain.on('exit-app', (e, args) => {
+  app.exit()
 })
