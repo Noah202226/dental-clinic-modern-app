@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 
 // Mongodb
 import db from './mongoConnection'
-import { InstallmentPatient, NewPatient, NewSale, Users } from './shemas'
+import { Expenses, InstallmentPatient, NewPatient, NewSale, Users } from './shemas'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -230,7 +230,6 @@ ipcMain.on('update-installment-patient-gives', async (e, args) => {
 
 // Sales Report
 ipcMain.on('get-filtered-sales-record', async (e, args) => {
-  console.log(args)
   try {
     const data = await NewSale.find({
       dateTransact: { $gte: args.firstDay, $lte: args.lastDay }
@@ -239,6 +238,20 @@ ipcMain.on('get-filtered-sales-record', async (e, args) => {
     e.reply('filted-sales', JSON.stringify(data))
   } catch (error) {
     console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Expenses
+// New Expense
+ipcMain.on('new-expense', async (e, args) => {
+  const data = new Expenses(args)
+  try {
+    await data.save()
+    // Handle any success messages or redirects
+    e.reply('new-expense-saved')
+  } catch (error) {
+    console.error('Error saving expense:', error)
     // Handle any error messages or error handling
   }
 })

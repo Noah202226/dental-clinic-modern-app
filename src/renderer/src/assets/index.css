@@ -37,3 +37,8 @@ dialog:not([notopen]) {
 .capitalize > :nth-child(2) > :nth-child(1) {
   text-transform: capitalize;
 }
+
+button.MuiButtonGroup-grouped {
+  font-size: 11px;
+  text-transform: capitalize;
+}

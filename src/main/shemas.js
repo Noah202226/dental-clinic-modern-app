@@ -47,9 +47,16 @@ const InstallmentPatientSchema = new Schema({
   }
 })
 
+const ExpenseSchema = new Schema({
+  expenseName: String,
+  dateTransact: Date,
+  amountPaid: Number
+})
+
 const Users = model('users', userSchema)
 const NewPatient = model('new-patient', NewPatientSchema)
 const NewSale = model('sales-record', SaleRecordSchema)
 const InstallmentPatient = model('installment-patient', InstallmentPatientSchema)
+const Expenses = model('expenses', ExpenseSchema)
 
-export { Users, NewPatient, NewSale, InstallmentPatient }
+export { Users, NewPatient, NewSale, InstallmentPatient, Expenses }
