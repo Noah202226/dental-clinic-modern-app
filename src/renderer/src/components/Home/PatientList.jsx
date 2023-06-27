@@ -74,7 +74,10 @@ const PatientList = ({ patients }) => {
   // Input States
   const [dateTransact, setdateTransact] = useState()
 
-  const [newTrasaction, setnewTrasaction] = useState()
+  const [patientID, setPatientID] = useState()
+
+  const [newTrasactionDate, setnewTrasactionDate] = useState()
+  const [newTransactionAmount, setNewTransactionAmount] = useState()
 
   const [patientName, setPatientName] = useState('')
   const [patientAddress, setPatientAddress] = useState('')
@@ -87,6 +90,7 @@ const PatientList = ({ patients }) => {
   const [downpayment, setdownpayment] = useState()
 
   const [gives, setGives] = useState([])
+  const [updatedGives, setUpdatedGives] = useState([])
   const [remainingBal, setremainingBal] = useState()
 
   const submitPatient = () => {
@@ -114,13 +118,8 @@ const PatientList = ({ patients }) => {
       amountPaid: downpaymentRef.current.children[1].children[0].value
     }
 
-    console.log(data)
-
-    ipcRenderer.send('new-installment-patient', data)
     ipcRenderer.send('new-sale-record', sale)
-
-    ipcRenderer.send('patients-records')
-    ipcRenderer.send('installment-patient-records')
+    ipcRenderer.send('new-installment-patient', data)
   }
 
   const getPatientInfo = (id, fullName) => {
@@ -134,14 +133,64 @@ const PatientList = ({ patients }) => {
     console.log('updating...')
   }
   const deleteInstallmentPatient = () => {
-    console.log('deleting...')
+    console.log('deleting ...')
+    ipcRenderer.send('delete-installment-patient', patientID)
   }
 
-  const submitNewGive = () => {}
+  const submitNewGive = () => {
+    setGives((prev) => [
+      ...prev,
+      { givenDate: newTrasactionDate, amountGive: newTransactionAmount }
+    ])
+    setUpdatedGives((prev) => [
+      ...prev,
+      { givenDate: newTrasactionDate, amountGive: newTransactionAmount }
+    ])
+
+    // const sale = {
+    //   dateTransact: newTrasactionDate,
+    //   patientName: patientName,
+    //   treatmentRendered: treatmentRendered,
+    //   treatmentType: treatmentType,
+    //   amountPaid: newTransactionAmount,
+    // }
+    // ipcRenderer.send('new-sale-record', sale)
+  }
+
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    if (isInitialLoad) {
+      // Skip running the code on the initial load
+      setIsInitialLoad(false)
+      return
+    }
+
+    ipcRenderer.send('update-installment-patient-gives', {
+      patientID,
+      gives: updatedGives,
+      remainingBal: remainingBal - newTransactionAmount
+    })
+    const sale = {
+      dateTransact: newTransactionAmount,
+      patientName: patientName,
+      treatmentRendered: treatmentRendered,
+      treatmentType: treatmentType,
+      amountPaid: newTransactionAmount
+    }
+
+    ipcRenderer.send('new-sale-record', sale)
+
+    setremainingBal(remainingBal - newTransactionAmount)
+  }, [updatedGives])
 
   useEffect(() => {
     ipcRenderer.on('installment-patient-saved', (e, args) => {
+      ipcRenderer.send('patients-records')
+      ipcRenderer.send('installment-patient-records')
       toast.success(args, { position: 'bottom-right' })
+
+      newPatientRef.current.close()
     })
 
     ipcRenderer.on('installment-patient-info', (e, args) => {
@@ -149,6 +198,7 @@ const PatientList = ({ patients }) => {
 
       console.log(installmentPatientInfo)
 
+      setPatientID(installmentPatientInfo._id)
       setdateTransact(installmentPatientInfo.dateTransact)
       setPatientName(installmentPatientInfo.patientName)
       setPatientAddress(installmentPatientInfo.patientAddress)
@@ -163,13 +213,51 @@ const PatientList = ({ patients }) => {
       setGives(installmentPatientInfo.gives)
       setremainingBal(installmentPatientInfo.remainingBal)
     })
+
+    ipcRenderer.on('installment-patient-deleted', (e, args) => {
+      toast.success('Patient Deleted', { position: 'bottom-right' })
+
+      setPatientID('')
+      setdateTransact('')
+      setPatientName('')
+      setPatientAddress('')
+      setAge('')
+
+      setTreatmentRendered('')
+      setTreatmentType('')
+
+      setServicePrice('')
+      setdownpayment('')
+
+      setremainingBal('')
+
+      ipcRenderer.send('patients-records')
+      ipcRenderer.send('installment-patient-records')
+
+      patientInfoRef.current.close()
+    })
+
+    ipcRenderer.on('installment-patient-gives-updated', (e, args) => {
+      toast.success('Patient gives updated.', { position: 'bottom-right' })
+
+      ipcRenderer.send('patients-records')
+      ipcRenderer.send('installment-patient-records')
+
+      ipcRenderer.send('get-installment-patient-info', patientID)
+    })
   }, [])
   return (
     <>
       <Paper sx={{ background: 'green', padding: 1 }}>
         <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
           <Typography variant="h4">Patient List</Typography>
-          <Button variant="contained" onClick={() => newPatientRef.current.showModal()}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              newPatientRef.current.showModal()
+              newPatientRef.current.classList.add('show')
+            }}
+          >
             New
           </Button>
         </Stack>
@@ -223,9 +311,20 @@ const PatientList = ({ patients }) => {
                       {patient.treatmentRendered}
                     </Typography>
                   </Stack>
+                  <Stack flexDirection={'row'} p={1} mt={-2}>
+                    <Typography variant="body">Treatment Type: </Typography>
+                    <Typography
+                      variant="caption2"
+                      color={'indigo'}
+                      ml={2}
+                      sx={{ textTransform: 'capitalize' }}
+                    >
+                      {patient.treatmentType}
+                    </Typography>
+                  </Stack>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} container>
                   <Stack flexDirection={'row'} p={1} mt={-2}>
                     <Typography variant="body">Service Price:</Typography>
                     <Typography variant="caption2" color={'indigo'} ml={2}>
@@ -237,6 +336,18 @@ const PatientList = ({ patients }) => {
                     <Typography variant="body">Downpayment: </Typography>
                     <Typography variant="caption2" color={'indigo'} ml={2}>
                       {patient.initialPay}
+                    </Typography>
+                  </Stack>
+
+                  <Stack flexDirection={'row'} p={1} mt={-2}>
+                    <Typography variant="body">Total Gives: </Typography>
+                    <Typography
+                      variant="caption2"
+                      color={'indigo'}
+                      ml={2}
+                      sx={{ textTransform: 'capitalize' }}
+                    >
+                      {patient.gives?.reduce((a, b) => a + b.amountGive, 0)}
                     </Typography>
                   </Stack>
 
@@ -363,14 +474,25 @@ const PatientList = ({ patients }) => {
               </Stack>
 
               <Stack flexDirection={'row'} justifyContent={'space-between'}>
-                <TextField type="date" label="Date" fullWidth />
-                <TextField type="number" label="Amount" />
+                <TextField
+                  type="date"
+                  label="Date"
+                  fullWidth
+                  value={newTrasactionDate}
+                  onChange={(e) => setnewTrasactionDate(e.target.value)}
+                />
+                <TextField
+                  type="number"
+                  label="Amount"
+                  value={newTransactionAmount}
+                  onChange={(e) => setNewTransactionAmount(e.target.value)}
+                />
               </Stack>
 
               <Stack flexDirection={'row'} justifyContent={'space-between'}>
                 <Typography variant="body">No. of Gives: {gives.length}</Typography>
                 <Typography variant="body">
-                  Total amount given: {gives.reduce((a, b) => a + parseInt(b.amountGive), 0)}
+                  Total amount given: {gives?.reduce((a, b) => a + parseInt(b.amountGive), 0)}
                 </Typography>
                 <Typography variant="body">Remaining amount: {remainingBal}</Typography>
               </Stack>
@@ -388,7 +510,7 @@ const PatientList = ({ patients }) => {
 
           <Grid item xs={7}>
             <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-              <Typography variant="h4">Patient Transactions - {}</Typography>
+              <Typography variant="h6">Patient Transactions - {patientID}</Typography>
               <Button
                 variant="contained"
                 color="error"

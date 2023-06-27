@@ -1,7 +1,7 @@
 import { Button, Stack } from '@mui/material'
 import React from 'react'
 
-const Actions = () => {
+const Actions = ({ transactionReportRef }) => {
   return (
     <Stack
       display={'flex'}
@@ -13,8 +13,12 @@ const Actions = () => {
         New Expense
       </Button>
 
-      <Button variant="contained" color="success">
-        Sales report
+      <Button
+        variant="contained"
+        color="success"
+        onClick={() => transactionReportRef.current.showModal()}
+      >
+        Reports
       </Button>
 
       <Button variant="contained" color="warning">

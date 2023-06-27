@@ -21,7 +21,13 @@ dialog {
   left: 50%;
   transform: translate(-50%, -50%);
 
+  opacity: 0;
+  transition: opacity 500s ease-in-out none;
+
   z-index: 99999999 !important;
+}
+dialog:not([notopen]) {
+  opacity: 1;
 }
 
 .MuiSelect-select {

@@ -111,10 +111,10 @@ ipcMain.on('new-sale-record', async (e, args) => {
   try {
     await newSale.save()
     // await newPatient2.save()
-    console.log('User saved successfully!')
+    console.log('New sale saved successfully!')
     // Handle any success messages or redirects
   } catch (error) {
-    console.error('Error saving user:', error)
+    console.error('Error saving sale:', error)
     // Handle any error messages or error handling
   }
 })
@@ -139,7 +139,6 @@ ipcMain.on('get-patient-info', async (e, args) => {
 })
 
 ipcMain.on('delete-patient', async (e, args) => {
-  console.log(args)
   try {
     await NewPatient.findByIdAndDelete(args)
     // await newPatient2.save()
@@ -184,8 +183,6 @@ ipcMain.on('get-installment-patient-info', async (e, args) => {
   e.reply('installment-patient-info', JSON.stringify(installmentPatientData))
 })
 ipcMain.on('new-installment-patient', async (e, args) => {
-  console.log(args)
-
   const newInstallmentPatient = new InstallmentPatient(args)
 
   try {
@@ -195,6 +192,51 @@ ipcMain.on('new-installment-patient', async (e, args) => {
     // Handle any success messages or redirects
 
     e.reply('installment-patient-saved', 'patient info updated .')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+ipcMain.on('delete-installment-patient', async (e, args) => {
+  try {
+    await InstallmentPatient.findByIdAndDelete(args)
+    // await newPatient2.save()
+    console.log('Installment Patient Deleted successfully!')
+    // Handle any success messages or redirects
+
+    e.reply('installment-patient-deleted', 'delete now.')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+ipcMain.on('update-installment-patient-gives', async (e, args) => {
+  try {
+    const data = await InstallmentPatient.updateOne(
+      { _id: args.patientID },
+      { $set: { gives: args.gives, remainingBal: args.remainingBal } }
+    )
+    // await newPatient2.save()
+    console.log('Installment Patient Give Updated successfully!', data)
+    // Handle any success messages or redirects
+
+    e.reply('installment-patient-gives-updated', 'delete now.')
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Sales Report
+ipcMain.on('get-filtered-sales-record', async (e, args) => {
+  console.log(args)
+  try {
+    const data = await NewSale.find({
+      dateTransact: { $gte: args.firstDay, $lte: args.lastDay }
+    }).sort({ dateTransact: 'asc' })
+    // Handle any success messages or redirects
+    e.reply('filted-sales', JSON.stringify(data))
   } catch (error) {
     console.error('Error saving user:', error)
     // Handle any error messages or error handling

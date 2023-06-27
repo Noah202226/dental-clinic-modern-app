@@ -41,7 +41,10 @@ const InstallmentPatientSchema = new Schema({
   servicePrice: Number,
   initialPay: Number,
   remainingBal: Number,
-  gives: [{ String, Number }]
+  gives: {
+    type: [{ givenDate: Date, amountGive: Number }],
+    default: []
+  }
 })
 
 const Users = model('users', userSchema)
