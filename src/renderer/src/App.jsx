@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 
 function App() {
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin, setIsLogin] = useState(false)
 
   const ipcRenderer = window.ipcRenderer
 

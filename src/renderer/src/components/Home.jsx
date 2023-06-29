@@ -2,7 +2,6 @@ import {
   Button,
   ButtonGroup,
   Grid,
-  IconButton,
   Stack,
   TablePagination,
   TextField,
@@ -71,10 +70,6 @@ const Home = () => {
     setPage2(0)
   }
 
-  function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein }
-  }
-
   const [rows, setRows] = useState([])
   const [filterRows, setfilterRows] = useState([])
 
@@ -121,7 +116,7 @@ const Home = () => {
   }
 
   // Export functions
-  const exportIt = () => {
+  const notyetworking = () => {
     toast.warn('Its not yet work. Sorry', {
       position: 'top-center',
       containerId: 'transactionsNofity'
@@ -265,7 +260,7 @@ const Home = () => {
           </Stack>
 
           <Stack>
-            <Button variant="contained" color="warning" onClick={exportIt}>
+            <Button variant="contained" color="warning" onClick={notyetworking}>
               <ImportExport />
               Export To Excel
             </Button>

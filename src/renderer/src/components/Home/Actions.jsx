@@ -2,6 +2,13 @@ import { Button, Stack } from '@mui/material'
 import React from 'react'
 
 const Actions = ({ transactionReportRef, expenseModalRef }) => {
+  // Export functions
+  const notyetworking = () => {
+    toast.warn('Its not yet work. Sorry', {
+      position: 'top-center',
+      containerId: 'homeToastifyContainer'
+    })
+  }
   return (
     <Stack
       display={'flex'}
@@ -21,7 +28,7 @@ const Actions = ({ transactionReportRef, expenseModalRef }) => {
         Reports
       </Button>
 
-      <Button variant="contained" color="warning">
+      <Button variant="contained" color="warning" onClick={notyetworking}>
         Settings
       </Button>
     </Stack>
