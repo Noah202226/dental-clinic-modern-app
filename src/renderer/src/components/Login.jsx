@@ -51,12 +51,20 @@ const Login = ({ setIsLogin }) => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
-          justifyContent: 'space-around'
+          justifyContent: 'space-around',
+          gap: 2
         }}
       >
-        <Typography>Login Page</Typography>
+        <Typography variant="h3">Dental Clinic Program</Typography>
 
-        <TextField type="text" label="Username" ref={userRef} disabled={isLoading} fullWidth />
+        <TextField
+          type="text"
+          label="Username"
+          ref={userRef}
+          disabled={isLoading}
+          fullWidth
+          focused
+        />
         <TextField type="password" label="Password" ref={pwdRef} disabled={isLoading} fullWidth />
 
         <Stack
@@ -71,7 +79,7 @@ const Login = ({ setIsLogin }) => {
           </Button>
         </Stack>
 
-        <ToastContainer />
+        <ToastContainer autoClose={2000} pauseOnFocusLoss={false} pauseOnHover={false} />
       </Box>
     </Box>
   )

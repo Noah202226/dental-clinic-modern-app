@@ -2,6 +2,7 @@ import {
   Button,
   ButtonGroup,
   Grid,
+  IconButton,
   Stack,
   TablePagination,
   TextField,
@@ -24,7 +25,8 @@ import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import NewExpense from './Home/NewExpense'
 import SalesInfo from './Home/SalesInfo'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
+import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
 
 const Home = () => {
   const ipcRenderer = window.ipcRenderer
@@ -42,6 +44,8 @@ const Home = () => {
   const transactionReportRef = useRef()
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
+  const [page2, setPage2] = React.useState(0)
+  const [rowsPerPage2, setRowsPerPage2] = React.useState(10)
 
   const [firstDayOfMonth, setFirstDayOfMonth] = useState()
   const [lastDayOfMonth, setLastDayOfMonth] = useState()
@@ -56,6 +60,15 @@ const Home = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
+  }
+  // expense
+  const handleChangePageExpense = (event, newPage) => {
+    setPage2(newPage)
+  }
+
+  const handleChangeRowsPerPageExpense = (event) => {
+    setRowsPerPage2(+event.target.value)
+    setPage2(0)
   }
 
   function createData(name, calories, fat, carbs, protein) {
@@ -104,6 +117,14 @@ const Home = () => {
     ipcRenderer.send('get-filtered-expenses-record', {
       firstDay: firstDayOfMonth,
       lastDay: lastDayOfMonth
+    })
+  }
+
+  // Export functions
+  const exportIt = () => {
+    toast.warn('Its not yet work. Sorry', {
+      position: 'top-center',
+      containerId: 'transactionsNofity'
     })
   }
 
@@ -212,24 +233,43 @@ const Home = () => {
             color="error"
             onClick={() => transactionReportRef.current.close()}
           >
-            Close
+            <CloseOutlined />
+            (ESC)
           </Button>
         </Stack>
 
-        <Stack flexDirection={'row'}>
-          <TextField
-            type="date"
-            value={firstDayOfMonth}
-            onChange={(e) => setFirstDayOfMonth(e.target.value)}
-          />
-          <TextField
-            type="date"
-            value={lastDayOfMonth}
-            onChange={(e) => setLastDayOfMonth(e.target.value)}
-          />
-          <Button variant="contained" onClick={getDataRange}>
-            Get date
-          </Button>
+        <Stack flexDirection={'row'} justifyContent={'space-between'} mt={1}>
+          <Stack
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
+            width={550}
+          >
+            <Typography variant="h6">Date range:</Typography>
+            <TextField
+              type="date"
+              value={firstDayOfMonth}
+              onChange={(e) => setFirstDayOfMonth(e.target.value)}
+              size="small"
+            />
+            <TextField
+              type="date"
+              size="small"
+              value={lastDayOfMonth}
+              onChange={(e) => setLastDayOfMonth(e.target.value)}
+            />
+            <Button variant="contained" size="small" onClick={getDataRange}>
+              Get Data
+              <DatasetLinked />
+            </Button>
+          </Stack>
+
+          <Stack>
+            <Button variant="contained" color="warning" onClick={exportIt}>
+              <ImportExport />
+              Export To Excel
+            </Button>
+          </Stack>
         </Stack>
 
         <Grid container spacing={0.5}>
@@ -268,7 +308,7 @@ const Home = () => {
                             // year: '2-digit',
                             // month: '2-digit',
                             // day: '2-digit',
-                            dateStyle: 'long'
+                            dateStyle: 'short'
                           })}
                         </TableCell>
                         <TableCell align="center">{row.patientName}</TableCell>
@@ -457,7 +497,7 @@ const Home = () => {
                             // year: '2-digit',
                             // month: '2-digit',
                             // day: '2-digit',
-                            dateStyle: 'long'
+                            dateStyle: 'short'
                           })}
                         </TableCell>
                         <TableCell align="center">{row.expenseName}</TableCell>
@@ -539,13 +579,13 @@ const Home = () => {
               </Table>
 
               <TablePagination
-                rowsPerPageOptions={[-1]}
+                rowsPerPageOptions={[1]}
                 component="div"
                 count={filterExpenseRows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPage={rowsPerPage2}
+                page={page2}
+                onPageChange={handleChangePageExpense}
+                onRowsPerPageChange={handleChangeRowsPerPageExpense}
                 labelRowsPerPage=""
                 showFirstButton={true}
                 showLastButton={true}
@@ -554,10 +594,21 @@ const Home = () => {
           </Grid>
         </Grid>
 
-        <ToastContainer enableMultiContainer containerId={'transactionsNofity'} />
+        <ToastContainer
+          autoClose={2000}
+          pauseOnFocusLoss={false}
+          pauseOnHover={false}
+          enableMultiContainer
+          containerId={'transactionsNofity'}
+        />
       </dialog>
 
-      <SalesInfo saleTransactionRef={saleTransactionRef} txID={txID} />
+      <SalesInfo
+        saleTransactionRef={saleTransactionRef}
+        txID={txID}
+        firstDay={firstDay}
+        lastDay={lastDay}
+      />
 
       <NewExpense expenseModalRef={expenseModalRef} />
     </Stack>

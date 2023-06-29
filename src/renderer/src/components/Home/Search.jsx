@@ -5,8 +5,8 @@ const Search = ({ search, setsearch }) => {
   return (
     <TextField
       type="search"
-      variant="outlined"
       color="success"
+      InputLabelProps={{ shrink: true }}
       label="Search patient ...."
       value={search}
       onChange={(e) => setsearch(e.target.value)}

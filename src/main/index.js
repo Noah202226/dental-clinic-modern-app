@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 // Mongodb
 import db from './mongoConnection'
 import { Expenses, InstallmentPatient, NewPatient, NewSale, Users } from './shemas'
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -20,6 +21,16 @@ function createWindow() {
     }
   })
   mainWindow.maximize()
+
+  // Create an empty menu template
+  const menuTemplate = []
+
+  // Build the menu from the template
+  const menu = Menu.buildFromTemplate(menuTemplate)
+
+  // Set the menu as the application menu
+  mainWindow.setMenu(menu)
+
   mainWindow.on('ready-to-show', async () => {
     mainWindow.show()
   })
@@ -97,6 +108,7 @@ ipcMain.on('new-patient-record', async (e, args) => {
     await newPatient.save()
     // await newPatient2.save()
     console.log('User saved successfully!')
+    e.reply('new-patient-record-saved', 'New Patient Record Saved.')
     // Handle any success messages or redirects
   } catch (error) {
     console.error('Error saving user:', error)

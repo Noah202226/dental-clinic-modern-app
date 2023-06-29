@@ -2,7 +2,7 @@ import { Button, Stack, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const SalesInfo = ({ saleTransactionRef, txID }) => {
+const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
   const ipcRenderer = window.ipcRenderer
 
   const [patientName, setpatientName] = useState()
@@ -34,13 +34,21 @@ const SalesInfo = ({ saleTransactionRef, txID }) => {
       })
 
       ipcRenderer.on('tx-deleted', (e, args) => {
-        toast.success(args, { position: 'bottom-center', containerId: 'transactionsNofity' })
+        toast.success(args, { position: 'top-center', containerId: 'transactionsNofity' })
+
+        ipcRenderer.send('get-filtered-sales-record', { firstDay, lastDay })
+        ipcRenderer.send('get-filtered-expenses-record', { firstDay, lastDay })
 
         saleTransactionRef.current.close()
       })
 
       ipcRenderer.on('tx-updated', (e, args) => {
-        toast.success(args, { position: 'bottom-center' })
+        toast.success(args, { position: 'top-center', containerId: 'transactionsNofity' })
+
+        ipcRenderer.send('get-filtered-sales-record', { firstDay, lastDay })
+        ipcRenderer.send('get-filtered-expenses-record', { firstDay, lastDay })
+
+        saleTransactionRef.current.close()
       })
     }
   }, [txID])

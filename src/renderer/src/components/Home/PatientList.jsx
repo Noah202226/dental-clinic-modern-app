@@ -12,7 +12,7 @@ import {
   Typography
 } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import { toast } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 
 const PatientList = ({ patients }) => {
   const ipcRenderer = window.ipcRenderer
@@ -188,7 +188,10 @@ const PatientList = ({ patients }) => {
     ipcRenderer.on('installment-patient-saved', (e, args) => {
       ipcRenderer.send('patients-records')
       ipcRenderer.send('installment-patient-records')
-      toast.success(args, { position: 'bottom-right' })
+      toast.success('New patient saved.', {
+        position: 'bottom-right',
+        containerId: 'homeToastifyContainer'
+      })
 
       newPatientRef.current.close()
     })
@@ -215,7 +218,10 @@ const PatientList = ({ patients }) => {
     })
 
     ipcRenderer.on('installment-patient-deleted', (e, args) => {
-      toast.success('Patient Deleted', { position: 'bottom-right' })
+      toast.success('Patient Deleted', {
+        position: 'bottom-right',
+        containerId: 'homeToastifyContainer'
+      })
 
       setPatientID('')
       setdateTransact('')
@@ -238,7 +244,10 @@ const PatientList = ({ patients }) => {
     })
 
     ipcRenderer.on('installment-patient-gives-updated', (e, args) => {
-      toast.success('Patient gives updated.', { position: 'bottom-right' })
+      toast.success('Patient gives updated.', {
+        position: 'bottom-right',
+        containerId: 'gives-nofity'
+      })
 
       ipcRenderer.send('patients-records')
       ipcRenderer.send('installment-patient-records')
@@ -248,9 +257,14 @@ const PatientList = ({ patients }) => {
   }, [])
   return (
     <>
-      <Paper sx={{ background: 'green', padding: 1 }}>
+      <Paper
+        className="scrollable-div"
+        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 460 }}
+      >
         <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Typography variant="h4">Patient List</Typography>
+          <Typography variant="h4">
+            {patients?.length > 0 ? 'Patient Lists' : 'Patient List'}
+          </Typography>
           <Button
             variant="contained"
             onClick={() => {
@@ -382,7 +396,7 @@ const PatientList = ({ patients }) => {
         </Stack>
 
         <Stack>
-          <TextField type="date" ref={dateTransactRef} />
+          <TextField type="date" InputLabelProps={{ shrink: true }} ref={dateTransactRef} />
         </Stack>
 
         <Stack sx={{ width: '100%', height: 150 }}>
@@ -477,6 +491,7 @@ const PatientList = ({ patients }) => {
                 <TextField
                   type="date"
                   label="Date"
+                  InputLabelProps={{ shrink: true }}
                   fullWidth
                   value={newTrasactionDate}
                   onChange={(e) => setnewTrasactionDate(e.target.value)}
@@ -541,18 +556,21 @@ const PatientList = ({ patients }) => {
                 label="Patient Name"
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
               <TextField
                 type="text"
                 label="Address"
                 value={patientAddress}
                 onChange={(e) => setPatientAddress(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
               <TextField
                 type="number"
                 label="Age"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
             </Stack>
 
@@ -568,12 +586,14 @@ const PatientList = ({ patients }) => {
                 value={treatmentRendered}
                 className="capitalize"
                 onChange={(e) => setTreatmentRendered(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
               <TextField
                 type="text"
                 label="Treatment Type"
                 value={treatmentType}
                 onChange={(e) => setTreatmentType(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
             </Stack>
 
@@ -583,12 +603,14 @@ const PatientList = ({ patients }) => {
                 label="Service Price"
                 value={servicePrice}
                 onChange={(e) => setServicePrice(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
               <TextField
                 type="number"
                 label="Downpayment"
                 value={downpayment}
                 onChange={(e) => setdownpayment(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
             </Stack>
 
@@ -600,6 +622,8 @@ const PatientList = ({ patients }) => {
             </Button>
           </Grid>
         </Grid>
+
+        <ToastContainer enableMultiContainer containerId={'gives-nofity'} />
       </dialog>
     </>
   )

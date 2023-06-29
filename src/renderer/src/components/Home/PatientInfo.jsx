@@ -7,6 +7,7 @@ import {
   Grid,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Stack,
   TextField,
@@ -226,6 +227,15 @@ const PatientInfo = ({ patients }) => {
       setmedicalHistory(data.medicalHistory)
     })
 
+    ipcRenderer.on('new-patient-record-saved', (e, args) => {
+      toast.success(args, {
+        position: 'bottom-right',
+        containerId: 'homeToastifyContainer'
+      })
+
+      ipcRenderer.send('patients-records')
+    })
+
     ipcRenderer.on('patient-deleted', (e, args) => {
       patientInfoRef.current.close()
 
@@ -256,9 +266,12 @@ const PatientInfo = ({ patients }) => {
   }, [])
   return (
     <>
-      <Box sx={{ background: 'red', padding: 1 }}>
+      <Paper
+        className="scrollable-div"
+        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 460 }}
+      >
         <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Typography variant="h4">Patient List</Typography>
+          <Typography variant="h4">Patient Records</Typography>
           <Button variant="contained" onClick={() => newPatientButtonRef.current.showModal()}>
             New
           </Button>
@@ -294,7 +307,7 @@ const PatientInfo = ({ patients }) => {
             </Stack>
           </Card>
         ))}
-      </Box>
+      </Paper>
 
       {/* New Patient Dialog */}
       <dialog
@@ -728,7 +741,13 @@ const PatientInfo = ({ patients }) => {
           </Grid>
         </Grid>
       </dialog>
-      <ToastContainer enableMultiContainer containerId={'homeToastifyContainer'} />
+      <ToastContainer
+        autoClose={2000}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+        enableMultiContainer
+        containerId={'homeToastifyContainer'}
+      />
     </>
   )
 }
