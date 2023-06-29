@@ -229,7 +229,10 @@ const PatientInfo = ({ patients }) => {
     ipcRenderer.on('patient-deleted', (e, args) => {
       patientInfoRef.current.close()
 
-      toast.success('Patient Deleted.', { position: 'bottom-right' })
+      toast.success('Patient Deleted.', {
+        position: 'bottom-right',
+        containerId: 'homeToastifyContainer'
+      })
 
       ipcRenderer.send('patients-records')
     })
@@ -237,7 +240,10 @@ const PatientInfo = ({ patients }) => {
     ipcRenderer.on('patient-updated', (e, args) => {
       patientInfoRef.current.close()
 
-      toast.success('Patient Info Updated.', { position: 'bottom-right' })
+      toast.success('Patient Info Updated.', {
+        position: 'bottom-right',
+        containerId: 'homeToastifyContainer'
+      })
 
       ipcRenderer.send('patients-records')
     })
@@ -722,7 +728,7 @@ const PatientInfo = ({ patients }) => {
           </Grid>
         </Grid>
       </dialog>
-      <ToastContainer />
+      <ToastContainer enableMultiContainer containerId={'homeToastifyContainer'} />
     </>
   )
 }

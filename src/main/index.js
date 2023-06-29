@@ -241,6 +241,18 @@ ipcMain.on('get-filtered-sales-record', async (e, args) => {
     // Handle any error messages or error handling
   }
 })
+ipcMain.on('get-filtered-expenses-record', async (e, args) => {
+  try {
+    const data = await Expenses.find({
+      dateTransact: { $gte: args.firstDay, $lte: args.lastDay }
+    }).sort({ dateTransact: 'asc' })
+    // Handle any success messages or redirects
+    e.reply('filted-expenses', JSON.stringify(data))
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
 
 // Expenses
 // New Expense
@@ -252,6 +264,43 @@ ipcMain.on('new-expense', async (e, args) => {
     e.reply('new-expense-saved')
   } catch (error) {
     console.error('Error saving expense:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// Get tx info
+ipcMain.on('get-sale-tx-info', async (e, args) => {
+  try {
+    const data = await NewSale.findOne({
+      _id: args
+    })
+    // Handle any success messages or redirects
+    e.reply('sale-tx-info', JSON.stringify(data))
+  } catch (error) {
+    console.error('Error getting tx:', error)
+    // Handle any error messages or error handling
+  }
+})
+// Delete tx
+ipcMain.on('delete-sale-tx', async (e, args) => {
+  try {
+    await NewSale.findByIdAndDelete({
+      _id: args
+    })
+    // Handle any success messages or redirects
+    e.reply('tx-deleted', 'Transaction deleted')
+  } catch (error) {
+    console.error('Error getting tx:', error)
+    // Handle any error messages or error handling
+  }
+})
+ipcMain.on('update-sale-tx', async (e, args) => {
+  try {
+    await NewSale.findByIdAndUpdate(args.txID, args.newData)
+    // Handle any success messages or redirects
+    e.reply('tx-updated', 'Transaction updated')
+  } catch (error) {
+    console.error('Error getting tx:', error)
     // Handle any error messages or error handling
   }
 })

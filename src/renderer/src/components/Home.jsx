@@ -23,6 +23,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import NewExpense from './Home/NewExpense'
+import SalesInfo from './Home/SalesInfo'
+import { ToastContainer } from 'react-toastify'
 
 const Home = () => {
   const ipcRenderer = window.ipcRenderer
@@ -63,6 +65,9 @@ const Home = () => {
   const [rows, setRows] = useState([])
   const [filterRows, setfilterRows] = useState([])
 
+  const [expenseRows, setexpenseRows] = useState([])
+  const [filterExpenseRows, setfilterExpenseRows] = useState([])
+
   // Expense Ref
   const expenseModalRef = useRef()
 
@@ -96,6 +101,10 @@ const Home = () => {
       firstDay: firstDayOfMonth,
       lastDay: lastDayOfMonth
     })
+    ipcRenderer.send('get-filtered-expenses-record', {
+      firstDay: firstDayOfMonth,
+      lastDay: lastDayOfMonth
+    })
   }
 
   // search
@@ -117,15 +126,14 @@ const Home = () => {
     setFilteredInstallmentPatientsData(filteredInstallmentPatients)
   }, [search])
 
+  // Get transaction info
+  const [txID, setTxID] = useState()
+
   // load data
   useEffect(() => {
     // Example usage
     ipcRenderer.send('patients-records')
     ipcRenderer.send('installment-patient-records')
-    ipcRenderer.send('get-filtered-sales-record', { firstDay, lastDay })
-
-    setFirstDayOfMonth(firstDay)
-    setLastDayOfMonth(lastDay)
 
     ipcRenderer.on('patients', (e, args) => {
       const data = JSON.parse(args)
@@ -148,10 +156,22 @@ const Home = () => {
       })
     })
 
+    // Getting sales and expenses
+    ipcRenderer.send('get-filtered-sales-record', { firstDay, lastDay })
+    ipcRenderer.send('get-filtered-expenses-record', { firstDay, lastDay })
+
+    setFirstDayOfMonth(firstDay)
+    setLastDayOfMonth(lastDay)
+
     ipcRenderer.on('filted-sales', (e, args) => {
       const txs = JSON.parse(args)
       setRows(txs)
       setfilterRows(txs)
+    })
+    ipcRenderer.on('filted-expenses', (e, args) => {
+      const txs = JSON.parse(args)
+      setexpenseRows(txs)
+      setfilterExpenseRows(txs)
     })
   }, [])
 
@@ -183,7 +203,7 @@ const Home = () => {
 
       <dialog
         ref={transactionReportRef}
-        style={{ position: 'relative', zIndex: 9999999, width: 1300, height: 700 }}
+        style={{ position: 'relative', zIndex: 9999999, width: '100%', height: '100%' }}
       >
         <Stack flexDirection={'row'} justifyContent={'space-between'}>
           <Typography variant="h4">Transactions Report</Typography>
@@ -212,187 +232,332 @@ const Home = () => {
           </Button>
         </Stack>
 
-        <TableContainer component={Paper} sx={{ width: 850, mt: 2 }}>
-          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell align="center">Patient Name</TableCell>
-                <TableCell align="right">Treatment Rendered</TableCell>
-                <TableCell align="right">Treatment Type</TableCell>
-                <TableCell align="right">Amount</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {filterRows
-                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <TableRow
-                    onClick={() => saleTransactionRef.current.showModal()}
-                    key={row._id}
-                    sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
-                      cursor: 'pointer',
-                      transition: 'all 0.3s',
-                      '&:hover': { background: 'rgba(10,10,60,0.2)', color: 'whitesmoke' }
-                    }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {new Date(row?.dateTransact).toLocaleString(undefined, {
-                        // year: '2-digit',
-                        // month: '2-digit',
-                        // day: '2-digit',
-                        dateStyle: 'long'
-                      })}
-                    </TableCell>
-                    <TableCell align="center">{row.patientName}</TableCell>
-                    <TableCell align="right">{row.treatmentRendered}</TableCell>
-                    <TableCell align="right">{row.treatmentType}</TableCell>
-                    <TableCell align="right">{row.amountPaid}</TableCell>
+        <Grid container spacing={0.5}>
+          <Grid item xs={7}>
+            <TableContainer component={Paper} sx={{ mt: 1, height: '100%' }}>
+              <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell align="center">Patient Name</TableCell>
+                    <TableCell align="right">Treatment Rendered</TableCell>
+                    <TableCell align="right">Treatment Type</TableCell>
+                    <TableCell align="right">Amount</TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
-            <caption style={{ captionSide: 'top' }}>
-              <Stack flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
-                <Typography>SALES</Typography>
-                <ButtonGroup size="small" variant="text">
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                    }}
-                  >
-                    All
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'oral-prophylaxis')
-                      )
-                    }}
-                  >
-                    Oral Prophylaxis
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'oral-surgery')
-                      )
-                    }}
-                  >
-                    Oral Surgery
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'restorative')
-                      )
-                    }}
-                  >
-                    Restorative
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'prosthodontics')
-                      )
-                    }}
-                  >
-                    Prosthodontics
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'orthodontics')
-                      )
-                    }}
-                  >
-                    Orthodontics
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'endodontics')
-                      )
-                    }}
-                  >
-                    Endodontics
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'cosmetics')
-                      )
-                    }}
-                  >
-                    Cosmetics
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setfilterRows(rows)
-                      setfilterRows((prev) =>
-                        prev.filter((sale) => sale.treatmentRendered === 'check-up')
-                      )
-                    }}
-                  >
-                    Check Up
-                  </Button>
-                </ButtonGroup>
-              </Stack>
-            </caption>
-            <caption style={{ captionSide: 'bottom', textAlign: 'end', fontSize: 18 }}>
-              <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                <Typography>No. of transaction: {filterRows.length}</Typography>
-                <Typography>
-                  Total Amount: {filterRows.reduce((a, b) => a + b.amountPaid, 0)}
-                </Typography>
-              </Stack>
-            </caption>
-          </Table>
+                </TableHead>
 
-          <TablePagination
-            rowsPerPageOptions={[-1]}
-            component="div"
-            count={filterRows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage=""
-            showFirstButton={true}
-            showLastButton={true}
-          />
-        </TableContainer>
+                <TableBody>
+                  {filterRows
+                    ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <TableRow
+                        onClick={() => {
+                          saleTransactionRef.current.showModal()
+                          setTxID(row._id)
+                        }}
+                        key={row._id}
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                          '&:hover': { background: 'rgba(10,10,60,0.2)', color: 'whitesmoke' }
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {new Date(row?.dateTransact).toLocaleString(undefined, {
+                            // year: '2-digit',
+                            // month: '2-digit',
+                            // day: '2-digit',
+                            dateStyle: 'long'
+                          })}
+                        </TableCell>
+                        <TableCell align="center">{row.patientName}</TableCell>
+                        <TableCell align="right">{row.treatmentRendered}</TableCell>
+                        <TableCell align="right">{row.treatmentType}</TableCell>
+                        <TableCell align="right">{row.amountPaid}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+                <caption style={{ captionSide: 'top' }}>
+                  <Stack
+                    flexDirection={'row'}
+                    justifyContent={'space-between'}
+                    alignItems={'center'}
+                  >
+                    <Typography>SALES</Typography>
+                    <ButtonGroup size="small" variant="text">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                        }}
+                      >
+                        All
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'oral-prophylaxis')
+                          )
+                        }}
+                      >
+                        Oral Prophylaxis
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'oral-surgery')
+                          )
+                        }}
+                      >
+                        Oral Surgery
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'restorative')
+                          )
+                        }}
+                      >
+                        Restorative
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'prosthodontics')
+                          )
+                        }}
+                      >
+                        Prosthodontics
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'orthodontics')
+                          )
+                        }}
+                      >
+                        Orthodontics
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'endodontics')
+                          )
+                        }}
+                      >
+                        Endodontics
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'cosmetics')
+                          )
+                        }}
+                      >
+                        Cosmetics
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterRows(rows)
+                          setfilterRows((prev) =>
+                            prev.filter((sale) => sale.treatmentRendered === 'check-up')
+                          )
+                        }}
+                      >
+                        Check Up
+                      </Button>
+                    </ButtonGroup>
+                  </Stack>
+                </caption>
+                <caption style={{ captionSide: 'bottom', textAlign: 'end', fontSize: 18 }}>
+                  <Stack
+                    flexDirection={'row'}
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
+                  >
+                    <Typography>No. of transaction: {filterRows.length}</Typography>
+                    <Typography>
+                      Total Amount: {filterRows.reduce((a, b) => a + b.amountPaid, 0)}
+                    </Typography>
+                  </Stack>
+                </caption>
+              </Table>
+
+              <TablePagination
+                rowsPerPageOptions={[-1]}
+                component="div"
+                count={filterRows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage=""
+                showFirstButton={true}
+                showLastButton={true}
+              />
+            </TableContainer>
+          </Grid>
+
+          {/* Expenses */}
+          <Grid item xs={5}>
+            <TableContainer component={Paper} sx={{ mt: 1, height: '100%' }}>
+              <Table sx={{ minWidth: 50, width: '95%' }} size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell align="center">Expense Name</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {filterExpenseRows
+                    ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <TableRow
+                        onClick={() => {
+                          getSalesTransactionInfo(row._id)
+                          saleTransactionRef.current.showModal()
+                        }}
+                        key={row._id}
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                          '&:hover': { background: 'rgba(10,10,60,0.2)', color: 'whitesmoke' }
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {new Date(row?.dateTransact).toLocaleString(undefined, {
+                            // year: '2-digit',
+                            // month: '2-digit',
+                            // day: '2-digit',
+                            dateStyle: 'long'
+                          })}
+                        </TableCell>
+                        <TableCell align="center">{row.expenseName}</TableCell>
+                        <TableCell align="right">{row.amountPaid}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+                <caption style={{ captionSide: 'top' }}>
+                  <Stack
+                    flexDirection={'row'}
+                    justifyContent={'space-between'}
+                    alignItems={'center'}
+                  >
+                    <Typography>EXPENSES</Typography>
+
+                    <ButtonGroup size="small" variant="text">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterExpenseRows(expenseRows)
+                        }}
+                      >
+                        All
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterExpenseRows(expenseRows)
+                          setfilterExpenseRows((prev) =>
+                            prev.filter((sale) => sale.expenseName === 'Meralco')
+                          )
+                        }}
+                      >
+                        Meralco
+                      </Button>
+
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterExpenseRows(expenseRows)
+                          setfilterExpenseRows((prev) =>
+                            prev.filter((sale) => sale.expenseName === 'Internet')
+                          )
+                        }}
+                      >
+                        Internet
+                      </Button>
+
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setfilterExpenseRows(expenseRows)
+                          setfilterExpenseRows((prev) =>
+                            prev.filter((sale) => sale.expenseName === 'Prime Water')
+                          )
+                        }}
+                      >
+                        Prime Water
+                      </Button>
+                    </ButtonGroup>
+                  </Stack>
+                </caption>
+                <caption style={{ captionSide: 'bottom', textAlign: 'end', fontSize: 18 }}>
+                  <Stack
+                    flexDirection={'row'}
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
+                  >
+                    <Typography>No. of transaction: {filterExpenseRows.length}</Typography>
+                    <Typography>
+                      Total Amount: {filterExpenseRows.reduce((a, b) => a + b.amountPaid, 0)}
+                    </Typography>
+                  </Stack>
+                </caption>
+              </Table>
+
+              <TablePagination
+                rowsPerPageOptions={[-1]}
+                component="div"
+                count={filterExpenseRows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage=""
+                showFirstButton={true}
+                showLastButton={true}
+              />
+            </TableContainer>
+          </Grid>
+        </Grid>
+
+        <ToastContainer enableMultiContainer containerId={'transactionsNofity'} />
       </dialog>
 
-      <dialog ref={saleTransactionRef}>
-        <Typography>Sale transaction info</Typography>
-      </dialog>
+      <SalesInfo saleTransactionRef={saleTransactionRef} txID={txID} />
 
       <NewExpense expenseModalRef={expenseModalRef} />
     </Stack>

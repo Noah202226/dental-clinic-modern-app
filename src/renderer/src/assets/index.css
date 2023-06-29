@@ -13,8 +13,9 @@ body {
 }
 
 dialog {
-  padding: 1rem;
-  border-radius: 1rem;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  margin: 0;
 
   position: absolute;
   top: 50%;
@@ -26,6 +27,7 @@ dialog {
 
   z-index: 99999999 !important;
 }
+
 dialog:not([notopen]) {
   opacity: 1;
 }
@@ -39,6 +41,10 @@ dialog:not([notopen]) {
 }
 
 button.MuiButtonGroup-grouped {
-  font-size: 11px;
+  font-size: 9px;
+  text-transform: capitalize;
+}
+button.expense-button-grouped {
+  font-size: 12px;
   text-transform: capitalize;
 }

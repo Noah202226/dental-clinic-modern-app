@@ -1,18 +1,18 @@
-import { Button, Stack, TextField, Typography } from '@mui/material'
-import React, { useEffect, useRef } from 'react'
+import { Button, ButtonGroup, Stack, TextField, Typography } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 const NewExpense = ({ expenseModalRef }) => {
   const ipcRenderer = window.ipcRenderer
 
-  const expenseName = useRef()
-  const expenseDate = useRef()
-  const expenseAmount = useRef()
+  const [expenseName, setexpenseName] = useState('')
+  const [expenseDate, setexpenseDate] = useState('')
+  const [expenseAmount, setexpenseAmount] = useState('')
   const submitExpense = () => {
     const data = {
-      expenseName: expenseName.current.children[0].children[0].value,
-      dateTransact: expenseDate.current.children[0].children[0].value,
-      amountPaid: expenseAmount.current.children[0].children[0].value
+      expenseName,
+      dateTransact: expenseDate,
+      amountPaid: expenseAmount
     }
 
     ipcRenderer.send('new-expense', data)
@@ -21,12 +21,13 @@ const NewExpense = ({ expenseModalRef }) => {
   useEffect(() => {
     ipcRenderer.on('new-expense-saved', (e, args) => {
       toast.warning('Expense saved', { position: 'bottom-left' })
+      setexpenseName('')
+      setexpenseDate('')
+      setexpenseAmount('')
     })
-
-    expenseName.current.children[0].children[0].value = ''
   }, [])
   return (
-    <dialog ref={expenseModalRef} style={{ width: 800, height: 500 }}>
+    <dialog ref={expenseModalRef} style={{ width: 800, height: 350, padding: 12 }}>
       <Stack flexDirection={'row'} justifyContent={'space-between'}>
         <Typography variant="h4">New Expense</Typography>
         <Button variant="contained" color="error" onClick={() => expenseModalRef.current.close()}>
@@ -34,14 +35,51 @@ const NewExpense = ({ expenseModalRef }) => {
         </Button>
       </Stack>
 
-      <Stack>
-        <TextField type="text" helperText="Expense Name" ref={expenseName} />
-        <TextField type="date" helperText="Date" ref={expenseDate} />
-        <TextField type="number" helperText="Amount" ref={expenseAmount} />
+      <Stack mt={2} p={1}>
+        <Stack
+          flexDirection={'row'}
+          alignItems={'flex-start'}
+          justifyContent={'space-between'}
+          gap={3}
+        >
+          <TextField
+            type="text"
+            helperText="Expense Name"
+            value={expenseName}
+            onChange={(e) => setexpenseName(e.target.value)}
+            fullWidth
+          />
+          <ButtonGroup fullWidth>
+            <Button className="expense-button-grouped" onClick={() => setexpenseName('Meralco')}>
+              Meralco
+            </Button>
+            <Button
+              className="expense-button-grouped"
+              onClick={() => setexpenseName('Prime Water')}
+            >
+              Prime Water
+            </Button>
+            <Button className="expense-button-grouped" onClick={() => setexpenseName('Internet')}>
+              Internet
+            </Button>
+          </ButtonGroup>
+        </Stack>
+        <TextField
+          type="date"
+          helperText="Date"
+          value={expenseDate}
+          onChange={(e) => setexpenseDate(e.target.value)}
+        />
+        <TextField
+          type="number"
+          helperText="Amount"
+          value={expenseAmount}
+          onChange={(e) => setexpenseAmount(e.target.value)}
+        />
       </Stack>
 
       <Button variant="contained" color="info" onClick={submitExpense}>
-        Submt
+        Submit
       </Button>
     </dialog>
   )
