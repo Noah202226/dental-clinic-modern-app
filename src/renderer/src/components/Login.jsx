@@ -26,7 +26,6 @@ const Login = ({ setIsLogin }) => {
 
   useEffect(() => {
     ipcRenderer.on('validated-user', (e, args) => {
-      console.log(args)
       if (args !== null) {
         toast.success('Successfully login', { position: toast.POSITION.BOTTOM_RIGHT })
 

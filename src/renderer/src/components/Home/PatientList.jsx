@@ -17,6 +17,18 @@ import { ToastContainer, toast } from 'react-toastify'
 const PatientList = ({ patients }) => {
   const ipcRenderer = window.ipcRenderer
 
+  const [dateNow, setDateNow] = useState('')
+  useEffect(() => {
+    const currentDate = new Date()
+    const year = currentDate.getFullYear()
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = currentDate.getDate().toString().padStart(2, '0')
+
+    const formattedDate = `${year}-${month}-${day}`
+
+    setDateNow(formattedDate)
+  }, [])
+
   const newPatientRef = useRef()
   const patientInfoRef = useRef()
 
@@ -72,31 +84,31 @@ const PatientList = ({ patients }) => {
   const downpaymentRef = useRef()
 
   // Input States
-  const [dateTransact, setdateTransact] = useState()
+  const [dateTransact, setdateTransact] = useState('')
 
-  const [patientID, setPatientID] = useState()
+  const [patientID, setPatientID] = useState('')
 
-  const [newTrasactionDate, setnewTrasactionDate] = useState()
-  const [newTransactionAmount, setNewTransactionAmount] = useState()
+  const [newTrasactionDate, setnewTrasactionDate] = useState('')
+  const [newTransactionAmount, setNewTransactionAmount] = useState('')
 
   const [patientName, setPatientName] = useState('')
   const [patientAddress, setPatientAddress] = useState('')
   const [age, setAge] = useState('')
 
-  const [treatmentRendered, setTreatmentRendered] = useState()
-  const [treatmentType, setTreatmentType] = useState()
+  const [treatmentRendered, setTreatmentRendered] = useState('')
+  const [treatmentType, setTreatmentType] = useState('')
 
-  const [servicePrice, setServicePrice] = useState()
-  const [downpayment, setdownpayment] = useState()
+  const [servicePrice, setServicePrice] = useState('')
+  const [downpayment, setdownpayment] = useState('')
 
   const [gives, setGives] = useState([])
   const [updatedGives, setUpdatedGives] = useState([])
-  const [remainingBal, setremainingBal] = useState()
+  const [remainingBal, setremainingBal] = useState('')
 
   const submitPatient = () => {
     // console.log(treatmentTypeRef.current.children[0].value)
     const data = {
-      dateTransact: dateTransactRef.current.children[0].children[0].value,
+      dateTransact: dateNow,
       patientName: patientNameRef.current.children[1].children[0].value,
       patientAge: ageRef.current.children[1].children[0].value,
       patientAddress: patientAddresRef.current.children[1].children[0].value,
@@ -111,7 +123,7 @@ const PatientList = ({ patients }) => {
     }
 
     const sale = {
-      dateTransact: dateTransactRef.current.children[0].children[0].value,
+      dateTransact: dateNow,
       patientName: patientNameRef.current.children[1].children[0].value,
       treatmentRendered: selectedTreatment,
       treatmentType: treatmentTypeRef.current.children[0].value,
@@ -120,6 +132,17 @@ const PatientList = ({ patients }) => {
 
     ipcRenderer.send('new-sale-record', sale)
     ipcRenderer.send('new-installment-patient', data)
+
+    // Reset Fields
+    patientNameRef.current.children[1].children[0].value = ''
+    ageRef.current.children[1].children[0].value = ''
+    patientAddresRef.current.children[1].children[0].value = ''
+    setSelectedTreatment('Oral Prophylaxis')
+    treatmentTypeRef.current.children[0].value = ''
+
+    servicePriceRef.current.children[1].children[0].value = ''
+    treatmentTypeRef.current.children[0].value = ''
+    downpaymentRef.current.children[1].children[0].value = ''
   }
 
   const getPatientInfo = (id, fullName) => {
@@ -138,14 +161,8 @@ const PatientList = ({ patients }) => {
   }
 
   const submitNewGive = () => {
-    setGives((prev) => [
-      ...prev,
-      { givenDate: newTrasactionDate, amountGive: newTransactionAmount }
-    ])
-    setUpdatedGives((prev) => [
-      ...prev,
-      { givenDate: newTrasactionDate, amountGive: newTransactionAmount }
-    ])
+    setGives((prev) => [...prev, { givenDate: dateNow, amountGive: newTransactionAmount }])
+    setUpdatedGives((prev) => [...prev, { givenDate: dateNow, amountGive: newTransactionAmount }])
 
     // const sale = {
     //   dateTransact: newTrasactionDate,
@@ -198,8 +215,6 @@ const PatientList = ({ patients }) => {
 
     ipcRenderer.on('installment-patient-info', (e, args) => {
       const installmentPatientInfo = JSON.parse(args)
-
-      console.log(installmentPatientInfo)
 
       setPatientID(installmentPatientInfo._id)
       setdateTransact(installmentPatientInfo.dateTransact)
@@ -257,25 +272,25 @@ const PatientList = ({ patients }) => {
   }, [])
   return (
     <>
+      <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
+        <Typography variant="h5">
+          {patients?.length > 0 ? 'Patient Lists' : 'Patient List'}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => {
+            newPatientRef.current.showModal()
+            newPatientRef.current.classList.add('show')
+          }}
+        >
+          New
+        </Button>
+      </Stack>
       <Paper
         className="scrollable-div"
-        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 460 }}
+        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 454 }}
       >
-        <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Typography variant="h4">
-            {patients?.length > 0 ? 'Patient Lists' : 'Patient List'}
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => {
-              newPatientRef.current.showModal()
-              newPatientRef.current.classList.add('show')
-            }}
-          >
-            New
-          </Button>
-        </Stack>
-
         {patients.map((patient) => (
           <Card
             key={patient._id}
@@ -396,7 +411,13 @@ const PatientList = ({ patients }) => {
         </Stack>
 
         <Stack>
-          <TextField type="date" InputLabelProps={{ shrink: true }} ref={dateTransactRef} />
+          <TextField
+            type="date"
+            value={dateNow}
+            onChange={(e) => setDateNow(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            ref={dateTransactRef}
+          />
         </Stack>
 
         <Stack sx={{ width: '100%', height: 150 }}>
@@ -493,8 +514,8 @@ const PatientList = ({ patients }) => {
                   label="Date"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
-                  value={newTrasactionDate}
-                  onChange={(e) => setnewTrasactionDate(e.target.value)}
+                  value={dateNow}
+                  onChange={(e) => setDateNow(e.target.value)}
                 />
                 <TextField
                   type="number"

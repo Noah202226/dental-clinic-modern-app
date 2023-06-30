@@ -32,7 +32,7 @@ const Header = () => {
     }, 1000)
   }, [])
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 1 }}>
       <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} p={1}>
         <Stack
           flexDirection={'row'}
@@ -45,7 +45,7 @@ const Header = () => {
           <Typography variant="h2">Dental Clinic App</Typography>
         </Stack>
 
-        <Typography variant="h6" padding={2}>
+        <Typography variant="h5" fontSize={29} padding={1}>
           {dateTime}
         </Typography>
       </Stack>

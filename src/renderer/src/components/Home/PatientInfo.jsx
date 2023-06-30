@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Card,
@@ -18,13 +19,26 @@ import { ToastContainer, toast } from 'react-toastify'
 
 const PatientInfo = ({ patients }) => {
   const ipcRenderer = window.ipcRenderer
+
+  const [dateNow, setDateNow] = useState('')
+  useEffect(() => {
+    const currentDate = new Date()
+    const year = currentDate.getFullYear()
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = currentDate.getDate().toString().padStart(2, '0')
+
+    const formattedDate = `${year}-${month}-${day}`
+
+    setDateNow(formattedDate)
+  }, [])
+
   const newPatientButtonRef = useRef()
   const patientInfoRef = useRef()
 
-  const [selectedTreatment, setSelectedTreatment] = useState('')
+  const [selectedTreatment, setSelectedTreatment] = useState('Oral Prophylaxis')
   const [options, setOptions] = useState([])
 
-  const [patientInfo, setPatientInfo] = useState()
+  const [patientInfo, setPatientInfo] = useState('')
   const [patientTransactions, setPatientTransactions] = useState([])
 
   const handleSelectChange = (event) => {
@@ -91,36 +105,36 @@ const PatientInfo = ({ patients }) => {
   const treatmentTypeRef = useRef()
 
   // // inputs ref on patient info
-  const [fullName, setfullName] = useState()
+  const [fullName, setfullName] = useState('')
 
-  const [age, setage] = useState()
-  const [gender, setgender] = useState()
+  const [age, setage] = useState('')
+  const [gender, setgender] = useState('')
 
-  const [birthPlace, setbirthPlace] = useState()
-  const [nationality, setnationality] = useState()
-  const [civilStatus, setcivilStatus] = useState()
+  const [birthPlace, setbirthPlace] = useState('')
+  const [nationality, setnationality] = useState('')
+  const [civilStatus, setcivilStatus] = useState('')
 
-  const [occupation, setoccupation] = useState()
-  const [homeAddress, sethomeAddress] = useState()
-  const [personalContact, setpersonalContact] = useState()
+  const [occupation, setoccupation] = useState('')
+  const [homeAddress, sethomeAddress] = useState('')
+  const [personalContact, setpersonalContact] = useState('')
 
-  const [emergencyToContact, setemergencyToContact] = useState()
-  const [emergencyRelation, setemergencyRelation] = useState()
-  const [emergencyToContactNo, setemergencyToContactNo] = useState()
+  const [emergencyToContact, setemergencyToContact] = useState('')
+  const [emergencyRelation, setemergencyRelation] = useState('')
+  const [emergencyToContactNo, setemergencyToContactNo] = useState('')
 
-  const [medicalHistory, setmedicalHistory] = useState()
+  const [medicalHistory, setmedicalHistory] = useState('')
 
-  const [dateGiven, setdateGiven] = useState()
-  const [amount, setamount] = useState()
+  const [dateGiven, setdateGiven] = useState('')
+  const [amount, setamount] = useState('')
 
-  const [treatmentType, settreatmentType] = useState()
+  const [treatmentType, settreatmentType] = useState('')
 
   // Submit
   const submitForm = (e) => {
     e.preventDefault()
 
     const patientData = {
-      dateTransact: dateGivenRef.current.children[0].children[0].value,
+      dateTransact: dateNow,
       patientName: `${givenNameRef.current.children[1].children[0].value} ${middleNameRef.current.children[1].children[0].value} ${surnameRef.current.children[1].children[0].value}`,
       patientAge: ageRef.current.children[1].children[0].value,
       patientGender: genderRef,
@@ -136,7 +150,7 @@ const PatientInfo = ({ patients }) => {
       medicalHistory: medicalHistoryRef.current.children[1].children[0].value
     }
     const sale = {
-      dateTransact: dateGivenRef.current.children[0].children[0].value,
+      dateTransact: dateNow,
       patientName: `${givenNameRef.current.children[1].children[0].value} ${middleNameRef.current.children[1].children[0].value} ${surnameRef.current.children[1].children[0].value}`,
       treatmentRendered: selectedTreatment,
       treatmentType: treatmentTypeRef.current.children[0].children[0].value,
@@ -151,6 +165,27 @@ const PatientInfo = ({ patients }) => {
     ipcRenderer.send('patients-records')
 
     newPatientButtonRef.current.close()
+
+    // Reset fields
+    givenNameRef.current.children[1].children[0].value = ''
+    middleNameRef.current.children[1].children[0].value = ''
+    surnameRef.current.children[1].children[0].value = ''
+    ageRef.current.children[1].children[0].value = ''
+    setGenderRef('male')
+    birthPlaceRef.current.children[1].children[0].value = ''
+    nationalityRef.current.children[1].children[0].value = ''
+    civilStatusRef.current.children[1].children[0].value = ''
+    occupationRef.current.children[1].children[0].value = ''
+    homeAddressRef.current.children[1].children[0].value = ''
+    personalContactRef.current.children[1].children[0].value = ''
+    emergencyToContactRef.current.children[1].children[0].value = ''
+    relationRef.current.children[1].children[0].value = ''
+    emergencyToContactNoRef.current.children[1].children[0].value = ''
+    medicalHistoryRef.current.children[1].children[0].value = ''
+
+    setSelectedTreatment('Oral Prophylaxis')
+    amountRef.current.children[0].children[0].value = ''
+    treatmentTypeRef.current.children[0].children[0].value = ''
   }
 
   const newTransactionOnly = () => {
@@ -167,8 +202,6 @@ const PatientInfo = ({ patients }) => {
   }
 
   const getPatientInfo = (id, fullName) => {
-    console.log(id)
-
     ipcRenderer.send('get-patient-info', id)
     ipcRenderer.send('get-sales-record', fullName)
     patientInfoRef.current.showModal()
@@ -266,16 +299,20 @@ const PatientInfo = ({ patients }) => {
   }, [])
   return (
     <>
+      <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
+        <Typography variant="h5">Patient Records</Typography>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => newPatientButtonRef.current.showModal()}
+        >
+          New
+        </Button>
+      </Stack>
       <Paper
         className="scrollable-div"
-        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 460 }}
+        sx={{ background: 'rgba(50,200,150, 0.5)', padding: 1, overflow: 'auto', height: 454 }}
       >
-        <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          <Typography variant="h4">Patient Records</Typography>
-          <Button variant="contained" onClick={() => newPatientButtonRef.current.showModal()}>
-            New
-          </Button>
-        </Stack>
         {patients.map((patient) => (
           <Card
             key={patient._id}
@@ -386,7 +423,12 @@ const PatientInfo = ({ patients }) => {
           </Stack>
 
           <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
-            <TextField type="date" helperText="Date Given" fullWidth ref={dateGivenRef} />
+            <TextField
+              type="date"
+              helperText="Date Given"
+              value={dateNow}
+              onChange={(e) => setDateNow(e.target.value)}
+            />
             <TextField type="number" helperText="Amount" fullWidth ref={amountRef} />
           </Stack>
 
@@ -479,7 +521,7 @@ const PatientInfo = ({ patients }) => {
               justifyContent={'space-between'}
               mb={1}
             >
-              <Typography variant="h6">Patient Data - {patientInfo?._id}</Typography>
+              <Typography variant="h6">Patient Data</Typography>
               <Button
                 variant="contained"
                 color="error"
@@ -668,8 +710,8 @@ const PatientInfo = ({ patients }) => {
                   type="date"
                   helperText="Date Given"
                   fullWidth
-                  value={dateGiven}
-                  onChange={(e) => setdateGiven(e.target.value)}
+                  value={dateNow}
+                  onChange={(e) => setDateNow(e.target.value)}
                 />
                 <TextField
                   type="number"

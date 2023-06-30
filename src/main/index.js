@@ -20,6 +20,7 @@ function createWindow() {
       sandbox: false
     }
   })
+
   mainWindow.maximize()
 
   // Create an empty menu template
@@ -43,8 +44,6 @@ function createWindow() {
   mainWindow.on('close', (event) => {
     // Prevent the window from quitting immediately
     event.preventDefault()
-
-    console.log('close button clicked')
 
     mainWindow.webContents.send('closing-app', 'data')
   })
