@@ -10,10 +10,10 @@ import { Expenses, InstallmentPatient, NewPatient, NewSale, Users } from './shem
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
+    width: 1350,
     height: 670,
     show: false,
-    autoHideMenuBar: true,
+
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -34,6 +34,11 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', async () => {
     mainWindow.show()
+  })
+
+  mainWindow.on('will-resize', (event) => {
+    // Prevent resizing when dragging the window frame
+    event.preventDefault()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -87,6 +92,13 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+// Listen for a custom event indicating the settings have been saved
+ipcMain.on('settings-saved', () => {
+  // Relaunch the app to apply the updated settings
+  app.relaunch()
+  app.quit()
 })
 
 // In this file you can include the rest of your app"s specific main process
@@ -189,9 +201,14 @@ ipcMain.on('installment-patient-records', async (e, args) => {
 
 // Get installment patient info
 ipcMain.on('get-installment-patient-info', async (e, args) => {
-  const installmentPatientData = await InstallmentPatient.findOne({ _id: args })
+  try {
+    const installmentPatientData = await InstallmentPatient.findOne({ _id: args })
 
-  e.reply('installment-patient-info', JSON.stringify(installmentPatientData))
+    e.reply('installment-patient-info', JSON.stringify(installmentPatientData))
+  } catch (error) {
+    console.error('Error finding user:', args)
+    // Handle any error messages or error handling
+  }
 })
 ipcMain.on('new-installment-patient', async (e, args) => {
   const newInstallmentPatient = new InstallmentPatient(args)
@@ -223,21 +240,42 @@ ipcMain.on('delete-installment-patient', async (e, args) => {
 })
 
 ipcMain.on('update-installment-patient-gives', async (e, args) => {
+  console.log(args)
   try {
     const data = await InstallmentPatient.updateOne(
       { _id: args.patientID },
-      { $set: { gives: args.gives, remainingBal: args.remainingBal } }
+      {
+        $push: { gives: { givenDate: args.givenDate, amountGive: args.amountGive } },
+        remainingBal: args.remainingBal
+      }
     )
     // await newPatient2.save()
     console.log('Installment Patient Give Updated successfully!', data)
     // Handle any success messages or redirects
 
-    e.reply('installment-patient-gives-updated', 'delete now.')
+    e.reply('installment-patient-gives-updated', args.patientID)
   } catch (error) {
     console.error('Error saving user:', error)
     // Handle any error messages or error handling
   }
 })
+// ipcMain.on('update-installment-patient-gives', async (e, args) => {
+//   console.log(args)
+//   try {
+//     const data = await InstallmentPatient.updateOne(
+//       { _id: args.patientID },
+//       { $set: { gives: args.gives, remainingBal: args.remainingBal } }
+//     )
+//     // await newPatient2.save()
+//     console.log('Installment Patient Give Updated successfully!', data)
+//     // Handle any success messages or redirects
+
+//     e.reply('installment-patient-gives-updated', args.patientID)
+//   } catch (error) {
+//     console.error('Error saving user:', error)
+//     // Handle any error messages or error handling
+//   }
+// })
 
 // Sales Report
 ipcMain.on('get-filtered-sales-record', async (e, args) => {

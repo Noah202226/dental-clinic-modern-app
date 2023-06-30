@@ -41,10 +41,7 @@ const InstallmentPatientSchema = new Schema({
   servicePrice: Number,
   initialPay: Number,
   remainingBal: Number,
-  gives: {
-    type: [{ givenDate: Date, amountGive: Number }],
-    default: []
-  }
+  gives: [Object]
 })
 
 const ExpenseSchema = new Schema({

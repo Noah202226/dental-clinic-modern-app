@@ -17,6 +17,9 @@ import { ToastContainer, toast } from 'react-toastify'
 const PatientList = ({ patients }) => {
   const ipcRenderer = window.ipcRenderer
 
+  // For card gives rendering
+  let id = 0
+
   const [dateNow, setDateNow] = useState('')
   useEffect(() => {
     const currentDate = new Date()
@@ -88,7 +91,6 @@ const PatientList = ({ patients }) => {
 
   const [patientID, setPatientID] = useState('')
 
-  const [newTrasactionDate, setnewTrasactionDate] = useState('')
   const [newTransactionAmount, setNewTransactionAmount] = useState('')
 
   const [patientName, setPatientName] = useState('')
@@ -164,32 +166,18 @@ const PatientList = ({ patients }) => {
     setGives((prev) => [...prev, { givenDate: dateNow, amountGive: newTransactionAmount }])
     setUpdatedGives((prev) => [...prev, { givenDate: dateNow, amountGive: newTransactionAmount }])
 
-    // const sale = {
-    //   dateTransact: newTrasactionDate,
-    //   patientName: patientName,
-    //   treatmentRendered: treatmentRendered,
-    //   treatmentType: treatmentType,
-    //   amountPaid: newTransactionAmount,
-    // }
-    // ipcRenderer.send('new-sale-record', sale)
-  }
-
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-
-  useEffect(() => {
-    if (isInitialLoad) {
-      // Skip running the code on the initial load
-      setIsInitialLoad(false)
-      return
-    }
-
     ipcRenderer.send('update-installment-patient-gives', {
       patientID,
-      gives: updatedGives,
-      remainingBal: remainingBal - newTransactionAmount
+      givenDate: dateNow,
+      amountGive: newTransactionAmount
     })
+    // ipcRenderer.send('update-installment-patient-gives', {
+    //   patientID,
+    //   gives: updatedGives,
+    //   remainingBal: remainingBal - newTransactionAmount
+    // })
     const sale = {
-      dateTransact: newTransactionAmount,
+      dateTransact: dateNow,
       patientName: patientName,
       treatmentRendered: treatmentRendered,
       treatmentType: treatmentType,
@@ -199,7 +187,28 @@ const PatientList = ({ patients }) => {
     ipcRenderer.send('new-sale-record', sale)
 
     setremainingBal(remainingBal - newTransactionAmount)
-  }, [updatedGives])
+  }
+  const saveNewGive = () => {
+    setGives((prev) => [...prev, { givenDate: dateNow, amountGive: newTransactionAmount }])
+
+    // const newGiveData = {
+    //   patientID,
+    //   gives: gives,
+    //   remainingBal: remainingBal - newTransactionAmount
+    // }
+
+    // console.log(newGiveData)
+    // ipcRenderer.send('update-installment-patient-gives', newGiveData)
+
+    ipcRenderer.send('update-installment-patient-gives', {
+      patientID,
+      givenDate: dateNow,
+      amountGive: newTransactionAmount,
+      remainingBal: remainingBal - newTransactionAmount
+    })
+
+    // ipcRenderer.send('get-installment-patient-info', patientID)
+  }
 
   useEffect(() => {
     ipcRenderer.on('installment-patient-saved', (e, args) => {
@@ -214,6 +223,7 @@ const PatientList = ({ patients }) => {
     })
 
     ipcRenderer.on('installment-patient-info', (e, args) => {
+      console.log('get')
       const installmentPatientInfo = JSON.parse(args)
 
       setPatientID(installmentPatientInfo._id)
@@ -238,7 +248,6 @@ const PatientList = ({ patients }) => {
         containerId: 'homeToastifyContainer'
       })
 
-      setPatientID('')
       setdateTransact('')
       setPatientName('')
       setPatientAddress('')
@@ -259,7 +268,7 @@ const PatientList = ({ patients }) => {
     })
 
     ipcRenderer.on('installment-patient-gives-updated', (e, args) => {
-      toast.success('Patient gives updated.', {
+      toast.success('Patient gives updated.' + args, {
         position: 'bottom-right',
         containerId: 'gives-nofity'
       })
@@ -267,7 +276,7 @@ const PatientList = ({ patients }) => {
       ipcRenderer.send('patients-records')
       ipcRenderer.send('installment-patient-records')
 
-      ipcRenderer.send('get-installment-patient-info', patientID)
+      ipcRenderer.send('get-installment-patient-info', args)
     })
   }, [])
   return (
@@ -376,7 +385,7 @@ const PatientList = ({ patients }) => {
                       ml={2}
                       sx={{ textTransform: 'capitalize' }}
                     >
-                      {patient.gives?.reduce((a, b) => a + b.amountGive, 0)}
+                      {patient.gives?.reduce((a, b) => a + parseInt(b.amountGive), 0)}
                     </Typography>
                   </Stack>
 
@@ -503,7 +512,7 @@ const PatientList = ({ patients }) => {
               <Stack flexDirection={'row'} justifyContent={'space-between'}>
                 <Typography variant="h6">New Give</Typography>
 
-                <Button variant="contained" color="info" onClick={submitNewGive}>
+                <Button variant="contained" color="info" onClick={saveNewGive}>
                   Submit
                 </Button>
               </Stack>
@@ -536,12 +545,14 @@ const PatientList = ({ patients }) => {
 
             <Typography variant="h6">Patient Gives</Typography>
 
-            {gives.map((give) => (
-              <Card key={give.givenDate + 1}>
-                <Typography variant="h6">{give.givenDate}</Typography>
-                <Typography variant="h6">{give.amountGive}</Typography>
-              </Card>
-            ))}
+            {gives.map((give) => {
+              return (
+                <Card key={(id += 1)}>
+                  <Typography variant="h6">{give.givenDate}</Typography>
+                  <Typography variant="h6">{give.amountGive}</Typography>
+                </Card>
+              )
+            })}
           </Grid>
 
           <Grid item xs={7}>

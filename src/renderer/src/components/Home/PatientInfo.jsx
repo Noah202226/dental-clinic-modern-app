@@ -99,7 +99,6 @@ const PatientInfo = ({ patients }) => {
 
   const medicalHistoryRef = useRef()
 
-  const dateGivenRef = useRef()
   const amountRef = useRef()
 
   const treatmentTypeRef = useRef()
@@ -124,7 +123,6 @@ const PatientInfo = ({ patients }) => {
 
   const [medicalHistory, setmedicalHistory] = useState('')
 
-  const [dateGiven, setdateGiven] = useState('')
   const [amount, setamount] = useState('')
 
   const [treatmentType, settreatmentType] = useState('')
@@ -189,8 +187,15 @@ const PatientInfo = ({ patients }) => {
   }
 
   const newTransactionOnly = () => {
+    if (treatmentTypeRef.current.children[0].children[0].value === '') {
+      toast.warn('Please select treatment type', {
+        position: 'bottom-right',
+        containerId: 'patientInfoNotify'
+      })
+    }
+
     const sale = {
-      dateTransact: dateGiven,
+      dateTransact: dateNow,
       patientName: fullName,
       treatmentRendered: selectedTreatment,
       treatmentType: treatmentTypeRef.current.children[0].children[0].value,
@@ -499,6 +504,9 @@ const PatientInfo = ({ patients }) => {
             {patientTransactions.map((tx) => (
               <Card key={tx._id}>
                 <Typography variant="h6" fontSize={15}>
+                  Date: {tx.patientName}
+                </Typography>
+                <Typography variant="h6" fontSize={15}>
                   Date:{' '}
                   {new Date(tx.dateTransact).toLocaleString(undefined, {
                     weekday: 'long',
@@ -509,6 +517,12 @@ const PatientInfo = ({ patients }) => {
                 </Typography>
                 <Typography variant="h6" fontSize={14}>
                   Amount: {tx.amountPaid}
+                </Typography>
+                <Typography variant="h6" fontSize={14}>
+                  Treatment Rendered: {tx.treatmentRendered}
+                </Typography>
+                <Typography variant="h6" fontSize={14}>
+                  Treatment Type: {tx.treatmentType}
                 </Typography>
               </Card>
             ))}
@@ -738,10 +752,6 @@ const PatientInfo = ({ patients }) => {
                     sx={{ position: 'relative', zIndex: 2, width: 200 }}
                     fullWidth
                   >
-                    {/* <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem> */}
-
                     <option value={'oral-prophylaxis'}>Oral Prophylaxis</option>
                     <option value={'oral-surgery'}>Oral Surgery</option>
                     <option value={'prosthodontics'}>Prosthodontics</option>
@@ -765,10 +775,6 @@ const PatientInfo = ({ patients }) => {
                     value={treatmentType}
                     onChange={(e) => settreatmentType(e.target.value)}
                   >
-                    {/* <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem> */}
-
                     {options.map((option, index) => (
                       <option key={index} value={option}>
                         {option}
@@ -782,6 +788,14 @@ const PatientInfo = ({ patients }) => {
             </Card>
           </Grid>
         </Grid>
+
+        <ToastContainer
+          autoClose={2000}
+          pauseOnFocusLoss={false}
+          pauseOnHover={false}
+          enableMultiContainer
+          containerId={'patientInfoNotify'}
+        />
       </dialog>
       <ToastContainer
         autoClose={2000}

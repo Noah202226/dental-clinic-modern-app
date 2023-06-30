@@ -2,7 +2,7 @@ import { Button, Stack } from '@mui/material'
 import React from 'react'
 import { toast } from 'react-toastify'
 
-const Actions = ({ transactionReportRef, expenseModalRef }) => {
+const Actions = ({ transactionReportRef, expenseModalRef, settingModalRef }) => {
   // Export functions
   const notyetworking = () => {
     console.log('.')
@@ -30,7 +30,11 @@ const Actions = ({ transactionReportRef, expenseModalRef }) => {
         Reports
       </Button>
 
-      <Button variant="contained" color="warning" onClick={notyetworking}>
+      <Button
+        variant="contained"
+        color="warning"
+        onClick={() => settingModalRef.current.showModal()}
+      >
         Settings
       </Button>
     </Stack>

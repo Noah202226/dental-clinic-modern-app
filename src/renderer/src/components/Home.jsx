@@ -26,6 +26,7 @@ import NewExpense from './Home/NewExpense'
 import SalesInfo from './Home/SalesInfo'
 import { ToastContainer, toast } from 'react-toastify'
 import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
+import Settings from './Home/Settings'
 
 const Home = () => {
   const ipcRenderer = window.ipcRenderer
@@ -39,6 +40,9 @@ const Home = () => {
 
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
+  // Settings Ref
+
+  const settingModalRef = useRef()
   // Transaction refs
   const transactionReportRef = useRef()
   const [page, setPage] = React.useState(0)
@@ -201,7 +205,11 @@ const Home = () => {
         </Grid>
 
         <Grid item xs={4}>
-          <Actions transactionReportRef={transactionReportRef} expenseModalRef={expenseModalRef} />
+          <Actions
+            transactionReportRef={transactionReportRef}
+            expenseModalRef={expenseModalRef}
+            settingModalRef={settingModalRef}
+          />
         </Grid>
       </Grid>
 
@@ -604,6 +612,8 @@ const Home = () => {
         firstDay={firstDay}
         lastDay={lastDay}
       />
+
+      <Settings settingModalRef={settingModalRef} />
 
       <NewExpense expenseModalRef={expenseModalRef} />
     </Stack>
