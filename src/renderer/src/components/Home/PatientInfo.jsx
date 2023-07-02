@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Badge,
   Box,
   Button,
@@ -131,6 +132,8 @@ const PatientInfo = ({ patients }) => {
   const submitForm = (e) => {
     e.preventDefault()
 
+    // console.log(civilStatusRef.current.children[0].children[1].children[0].value)
+
     const patientData = {
       dateTransact: dateNow,
       patientName: `${givenNameRef.current.children[1].children[0].value} ${middleNameRef.current.children[1].children[0].value} ${surnameRef.current.children[1].children[0].value}`,
@@ -138,7 +141,7 @@ const PatientInfo = ({ patients }) => {
       patientGender: genderRef,
       placeOfBirth: birthPlaceRef.current.children[1].children[0].value,
       nationality: nationalityRef.current.children[1].children[0].value,
-      civilStatus: civilStatusRef.current.children[1].children[0].value,
+      civilStatus: civilStatusRef.current.children[0].children[1].children[0].value,
       occupation: occupationRef.current.children[1].children[0].value,
       address: homeAddressRef.current.children[1].children[0].value,
       personalContact: personalContactRef.current.children[1].children[0].value,
@@ -172,7 +175,7 @@ const PatientInfo = ({ patients }) => {
     setGenderRef('male')
     birthPlaceRef.current.children[1].children[0].value = ''
     nationalityRef.current.children[1].children[0].value = ''
-    civilStatusRef.current.children[1].children[0].value = ''
+    civilStatusRef.current.children[0].children[1].children[0].value = ''
     occupationRef.current.children[1].children[0].value = ''
     homeAddressRef.current.children[1].children[0].value = ''
     personalContactRef.current.children[1].children[0].value = ''
@@ -324,7 +327,7 @@ const PatientInfo = ({ patients }) => {
             sx={{
               mb: 1,
               cursor: 'pointer',
-              transition: 'all 0.3s',
+              transition: 'all 0.1s',
               '&:hover': {
                 boxShadow: '4px 4px 8px 4px rgba(20,50,80,5)',
                 marginLeft: 1
@@ -335,7 +338,7 @@ const PatientInfo = ({ patients }) => {
             <Stack display={'flex'} alignItems={'start'} justifyContent={'space-around'}>
               <Stack flexDirection={'row'} p={1} m={0}>
                 <Typography variant="h6">Patient Name:</Typography>
-                <Typography variant="h5" color={'indigo'}>
+                <Typography variant="h5" color={'indigo'} className="capitalize">
                   {patient.patientName}
                 </Typography>
               </Stack>
@@ -368,9 +371,9 @@ const PatientInfo = ({ patients }) => {
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
-          <TextField type="text" label="Surname" ref={surnameRef} />
-          <TextField type="text" label="Given Name" ref={givenNameRef} />
-          <TextField type="text" label="Middle Name" ref={middleNameRef} />
+          <TextField type="text" label="Surname" ref={surnameRef} className="capitalize" />
+          <TextField type="text" label="Given Name" ref={givenNameRef} className="capitalize" />
+          <TextField type="text" label="Middle Name" ref={middleNameRef} className="capitalize" />
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} mb={1}>
@@ -392,21 +395,40 @@ const PatientInfo = ({ patients }) => {
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
-          <TextField type="text" label="Birth Place" ref={birthPlaceRef} />
-          <TextField type="text" label="Nationality" ref={nationalityRef} />
-          <TextField type="text" label="Civil Status" ref={civilStatusRef} />
+          <TextField type="text" label="Birth Place" ref={birthPlaceRef} className="capitalize" />
+          <TextField type="text" label="Nationality" ref={nationalityRef} className="capitalize" />
+          {/* <TextField type="text" label="Civil Status" ref={civilStatusRef} className="capitalize" /> */}
+
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={['Single', 'Married', 'Widowed']}
+            sx={{ width: 300 }}
+            renderInput={(params) => <TextField {...params} label="Civil Status" />}
+            ref={civilStatusRef}
+          />
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
-          <TextField type="text" label="Occupation" ref={occupationRef} />
-          <TextField type="text" label="Home Address" ref={homeAddressRef} />
-          <TextField type="number" label="No" ref={personalContactRef} />
+          <TextField type="text" label="Occupation" ref={occupationRef} className="capitalize" />
+          <TextField type="text" label="Home Address" ref={homeAddressRef} className="capitalize" />
+          <TextField type="number" label="No" ref={personalContactRef} className="capitalize" />
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
-          <TextField type="text" label="Person to contact" ref={emergencyToContactRef} />
-          <TextField type="text" label="Relation" ref={relationRef} />
-          <TextField type="number" label="No" ref={emergencyToContactNoRef} />
+          <TextField
+            type="text"
+            label="Person to contact"
+            ref={emergencyToContactRef}
+            className="capitalize"
+          />
+          <TextField type="text" label="Relation" ref={relationRef} className="capitalize" />
+          <TextField
+            type="number"
+            label="No"
+            ref={emergencyToContactNoRef}
+            className="capitalize"
+          />
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
@@ -415,6 +437,7 @@ const PatientInfo = ({ patients }) => {
             label="Medical and Dental History"
             fullWidth
             ref={medicalHistoryRef}
+            className="capitalize"
           />
         </Stack>
 
@@ -554,6 +577,7 @@ const PatientInfo = ({ patients }) => {
               <TextField
                 type="text"
                 label="Patient Name"
+                className="capitalize"
                 value={fullName}
                 onChange={(e) => setfullName(e.target.value)}
 
@@ -618,16 +642,19 @@ const PatientInfo = ({ patients }) => {
                 label="Birth Place"
                 value={birthPlace}
                 onChange={(e) => setbirthPlace(e.target.value)}
+                className="capitalize"
               />
               <TextField
                 type="text"
                 label="Nationality"
                 value={nationality}
                 onChange={(e) => setnationality(e.target.value)}
+                className="capitalize"
               />
               <TextField
                 type="text"
                 label="Civil Status"
+                className="capitalize"
                 value={civilStatus}
                 onChange={(e) => setcivilStatus(e.target.value)}
               />
@@ -642,12 +669,14 @@ const PatientInfo = ({ patients }) => {
               <TextField
                 type="text"
                 label="Occupation"
+                className="capitalize"
                 value={occupation}
                 onChange={(e) => setoccupation(e.target.value)}
               />
               <TextField
                 type="text"
                 label="Home Address"
+                className="capitalize"
                 value={homeAddress}
                 onChange={(e) => sethomeAddress(e.target.value)}
               />
@@ -668,12 +697,14 @@ const PatientInfo = ({ patients }) => {
               <TextField
                 type="text"
                 label="Person to contact"
+                className="capitalize"
                 value={emergencyToContact}
                 onChange={(e) => setemergencyToContact(e.target.value)}
               />
               <TextField
                 type="text"
                 label="Relation"
+                className="capitalize"
                 value={emergencyRelation}
                 onChange={(e) => setemergencyRelation(e.target.value)}
               />
@@ -694,6 +725,7 @@ const PatientInfo = ({ patients }) => {
               <TextField
                 type="text"
                 label="Medical and Dental History"
+                className="capitalize"
                 fullWidth
                 value={medicalHistory}
                 onChange={(e) => setmedicalHistory(e.target.value)}

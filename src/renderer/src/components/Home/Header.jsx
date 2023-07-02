@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import icon from '../../assets/dentist.svg'
 import { useEffect, useState } from 'react'
 
-const Header = () => {
+const Header = ({ settingsData }) => {
   const [dateTime, setDateTime] = useState(
     Date.now().toLocaleString(undefined, {
       weekday: 'long',
@@ -42,7 +42,9 @@ const Header = () => {
         >
           <img src={icon} alt="heading image" width={100} height={100} />
 
-          <Typography variant="h2">Dental Clinic App</Typography>
+          <Typography variant="h2">
+            {settingsData ? settingsData?.appTitle : 'Default Title'}
+          </Typography>
         </Stack>
 
         <Typography variant="h5" fontSize={29} padding={1}>

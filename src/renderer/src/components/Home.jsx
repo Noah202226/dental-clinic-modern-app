@@ -41,8 +41,9 @@ const Home = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Settings Ref
-
   const settingModalRef = useRef()
+  const [settingInfo, setSettingInfo] = useState()
+
   // Transaction refs
   const transactionReportRef = useRef()
   const [page, setPage] = React.useState(0)
@@ -193,11 +194,19 @@ const Home = () => {
       setexpenseRows(txs)
       setfilterExpenseRows(txs)
     })
+
+    ipcRenderer.send('get-settings')
+
+    ipcRenderer.on('settings-data', (e, args) => {
+      const settingsData = JSON.parse(args)
+
+      setSettingInfo(settingsData[0])
+    })
   }, [])
 
   return (
     <Stack>
-      <Header />
+      <Header settingsData={settingInfo} />
 
       <Grid container spacing={1} p={1}>
         <Grid item xs={8}>
@@ -314,9 +323,15 @@ const Home = () => {
                             dateStyle: 'short'
                           })}
                         </TableCell>
-                        <TableCell align="center">{row.patientName}</TableCell>
-                        <TableCell align="right">{row.treatmentRendered}</TableCell>
-                        <TableCell align="right">{row.treatmentType}</TableCell>
+                        <TableCell align="center" className="capitalize">
+                          {row.patientName}
+                        </TableCell>
+                        <TableCell align="right" className="capitalize">
+                          {row.treatmentRendered}
+                        </TableCell>
+                        <TableCell align="right" className="capitalize">
+                          {row.treatmentType}
+                        </TableCell>
                         <TableCell align="right">{row.amountPaid}</TableCell>
                       </TableRow>
                     ))}

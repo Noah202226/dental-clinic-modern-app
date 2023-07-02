@@ -11,19 +11,35 @@ const NewExpense = ({ expenseModalRef }) => {
   const submitExpense = () => {
     const data = {
       expenseName,
-      dateTransact: expenseDate,
+      dateTransact: dateNow,
       amountPaid: expenseAmount
     }
 
     ipcRenderer.send('new-expense', data)
   }
 
+  const [dateNow, setDateNow] = useState('')
+  useEffect(() => {
+    const currentDate = new Date()
+    const year = currentDate.getFullYear()
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = currentDate.getDate().toString().padStart(2, '0')
+
+    const formattedDate = `${year}-${month}-${day}`
+
+    setDateNow(formattedDate)
+  }, [])
+
   useEffect(() => {
     ipcRenderer.on('new-expense-saved', (e, args) => {
-      toast.warning('Expense saved', { position: 'bottom-left' })
+      toast.warning('Expense saved', {
+        position: 'bottom-left',
+        containerId: 'homeToastifyContainer'
+      })
       setexpenseName('')
-      setexpenseDate('')
       setexpenseAmount('')
+
+      expenseModalRef.current.close()
     })
   }, [])
   return (
@@ -45,6 +61,7 @@ const NewExpense = ({ expenseModalRef }) => {
           <TextField
             type="text"
             helperText="Expense Name"
+            className="capitalize"
             value={expenseName}
             onChange={(e) => setexpenseName(e.target.value)}
             fullWidth
@@ -67,8 +84,8 @@ const NewExpense = ({ expenseModalRef }) => {
         <TextField
           type="date"
           helperText="Date"
-          value={expenseDate}
-          onChange={(e) => setexpenseDate(e.target.value)}
+          value={dateNow}
+          onChange={(e) => setDateNow(e.target.value)}
         />
         <TextField
           type="number"

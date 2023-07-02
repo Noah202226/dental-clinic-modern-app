@@ -306,7 +306,7 @@ const PatientList = ({ patients }) => {
             sx={{
               mb: 1,
               cursor: 'pointer',
-              transition: 'all 0.3s',
+              transition: 'all 0.1s',
               '&:hover': {
                 boxShadow: '4px 4px 8px 4px rgba(20,50,80,5)',
                 marginLeft: 1
@@ -434,8 +434,8 @@ const PatientList = ({ patients }) => {
         </Stack>
 
         <Stack>
-          <TextField type="text" label="Patient Name" ref={patientNameRef} />
-          <TextField type="text" label="Address" ref={patientAddresRef} />
+          <TextField type="text" label="Patient Name" ref={patientNameRef} className="capitalize" />
+          <TextField type="text" label="Address" ref={patientAddresRef} className="capitalize" />
           <TextField type="number" label="Age" ref={ageRef} />
         </Stack>
 

@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose'
 
 const userSchema = new Schema({
-  username: String,
-  email: String
+  name: String,
+  pwd: String,
+  accountType: String
   // Other user fields
 })
 
@@ -50,10 +51,20 @@ const ExpenseSchema = new Schema({
   amountPaid: Number
 })
 
+const SettingSchema = new Schema({
+  logoDir: String,
+  appTitle: String,
+  container1Title: String,
+  container2Title: String,
+  loginTitle: String,
+  loginBgColor: String
+})
+
 const Users = model('users', userSchema)
 const NewPatient = model('new-patient', NewPatientSchema)
 const NewSale = model('sales-record', SaleRecordSchema)
 const InstallmentPatient = model('installment-patient', InstallmentPatientSchema)
 const Expenses = model('expenses', ExpenseSchema)
+const SettingsData = model('settings', SettingSchema)
 
-export { Users, NewPatient, NewSale, InstallmentPatient, Expenses }
+export { Users, NewPatient, NewSale, InstallmentPatient, Expenses, SettingsData }

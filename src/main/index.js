@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 
 // Mongodb
 import db from './mongoConnection'
-import { Expenses, InstallmentPatient, NewPatient, NewSale, Users } from './shemas'
+import { Expenses, InstallmentPatient, NewPatient, NewSale, SettingsData, Users } from './shemas'
 
 function createWindow() {
   // Create the browser window.
@@ -104,12 +104,74 @@ ipcMain.on('settings-saved', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
+// Get settings
+ipcMain.on('get-settings', async (e, args) => {
+  try {
+    const settingsData = await SettingsData.find()
+
+    e.reply('settings-data', JSON.stringify(settingsData))
+    console.log(settingsData)
+  } catch (e) {
+    console.log(e)
+  }
+})
+ipcMain.on('new-setting', async (e, args) => {
+  const newSetting = await SettingsData.findByIdAndUpdate(args.id, { appTitle: args.appTitle })
+})
+
+// users
 ipcMain.on('check-user', async (e, args) => {
   const user = await Users.findOne({ name: args.name, pwd: args.pwd })
 
   e.reply('validated-user', user)
 })
+ipcMain.on('get-users', async (e, args) => {
+  const users = await Users.find()
 
+  e.reply('all-users', JSON.stringify(users))
+})
+ipcMain.on('updateUserInfo', async (e, args) => {
+  try {
+    const status = await Users.findByIdAndUpdate(args.id, {
+      name: args.name,
+      pwd: args.pass,
+      accountType: args.accountType
+    })
+
+    console.log(status)
+
+    e.reply('updated-user', 'User Updated.')
+  } catch (e) {
+    console.log(e)
+  }
+})
+ipcMain.on('delete-user', async (e, args) => {
+  console.log(args)
+  try {
+    await Users.findByIdAndDelete(args)
+
+    e.reply('deleted-user', 'User deleted.')
+  } catch (e) {
+    console.log(e)
+  }
+})
+// New patient
+ipcMain.on('new-user', async (e, args) => {
+  const newUser = new Users(args)
+
+  try {
+    await newUser.save()
+
+    console.log('User saved successfully!')
+    e.reply('new-patient-record-saved', 'New Patient Record Saved.')
+    // Handle any success messages or redirects
+  } catch (error) {
+    console.error('Error saving user:', error)
+    // Handle any error messages or error handling
+  }
+})
+
+// New patient
 ipcMain.on('new-patient-record', async (e, args) => {
   console.log(args)
 

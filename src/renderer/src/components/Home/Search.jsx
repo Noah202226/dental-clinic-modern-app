@@ -59,6 +59,7 @@ const Search = ({ search, setsearch }) => {
   return (
     <>
       <Input
+        className="capitalize"
         slots={{ input: StyledInputElement }}
         type="search"
         placeholder="Search Patient here..."
