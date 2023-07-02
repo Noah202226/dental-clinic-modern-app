@@ -28,7 +28,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
 import Settings from './Home/Settings'
 
-const Home = () => {
+const Home = ({ settingsInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
   const [patientsRecord, setPatientsRecord] = useState([])
@@ -42,7 +42,6 @@ const Home = () => {
 
   // Settings Ref
   const settingModalRef = useRef()
-  const [settingInfo, setSettingInfo] = useState()
 
   // Transaction refs
   const transactionReportRef = useRef()
@@ -194,19 +193,11 @@ const Home = () => {
       setexpenseRows(txs)
       setfilterExpenseRows(txs)
     })
-
-    ipcRenderer.send('get-settings')
-
-    ipcRenderer.on('settings-data', (e, args) => {
-      const settingsData = JSON.parse(args)
-
-      setSettingInfo(settingsData[0])
-    })
   }, [])
 
   return (
     <Stack>
-      <Header settingsData={settingInfo} />
+      <Header settingsData={settingsInfo} />
 
       <Grid container spacing={1} p={1}>
         <Grid item xs={8}>
@@ -628,7 +619,7 @@ const Home = () => {
         lastDay={lastDay}
       />
 
-      <Settings settingModalRef={settingModalRef} />
+      <Settings settingModalRef={settingModalRef} settingInfo={settingsInfo} />
 
       <NewExpense expenseModalRef={expenseModalRef} />
     </Stack>

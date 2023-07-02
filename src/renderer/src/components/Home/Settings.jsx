@@ -30,11 +30,17 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const Settings = ({ settingModalRef }) => {
+const Settings = ({ settingModalRef, settingInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
-  const [settingInfo, setSettingInfo] = useState()
+  // const [settingInfo, setSettingInfo] = useState()
+  const [settingsID, setsettingsID] = useState()
   const [appTitle, setAppTitle] = useState()
+  const [loginBgColor, setLoginBgColor] = useState()
+  const [loginTitle, setLoginTitle] = useState()
+  const [container1, setContainer1] = useState()
+  const [container2, setContainer2] = useState()
+  const [logoDir, setLogoDir] = useState()
 
   const modifyUserModalRef = useRef()
   const [users, setUsers] = useState([])
@@ -48,7 +54,7 @@ const Settings = ({ settingModalRef }) => {
 
   const saveSettings = () => {
     console.log(settingInfo._id)
-    ipcRenderer.send('new-setting', { id: settingInfo?.id, appTitle })
+    ipcRenderer.send('new-setting', { id: settingsID, appTitle, loginBgColor })
   }
 
   const updateUserInfo = (id) => {
@@ -65,6 +71,15 @@ const Settings = ({ settingModalRef }) => {
     ipcRenderer.send('delete-user', id)
   }
 
+  useEffect(() => {
+    setsettingsID(settingInfo?._id)
+    setAppTitle(settingInfo?.appTitle)
+    setLoginBgColor(settingInfo?.loginBgColor)
+    setLoginTitle(settingInfo?.loginTitle)
+    setContainer1(settingInfo?.container1)
+    setContainer2(settingInfo?.container2)
+    setLogoDir(settingInfo?.logoDir)
+  }, [settingInfo])
   useEffect(() => {
     ipcRenderer.send('get-users')
 
@@ -91,22 +106,10 @@ const Settings = ({ settingModalRef }) => {
 
     // Settings
 
-    ipcRenderer.send('get-settings')
-
-    ipcRenderer.on('settings-data', (e, args) => {
-      console.log()
-      try {
-        const settingsData = JSON.parse(args)
-
-        setSettingInfo(JSON.parse(args)[0])
-
-        setAppTitle(settingInfo?.appTitle)
-      } catch (e) {
-        console.log(e)
-      }
-    })
+    setAppTitle(settingInfo?.appTitle)
 
     ipcRenderer.on('settings-saved', (e, args) => {
+      console.log('new setting saved.')
       toast.success(`Setting saved. App will restart to apply changes.`, {
         position: 'top-center',
         containerId: 'settingsNofication'
@@ -116,6 +119,8 @@ const Settings = ({ settingModalRef }) => {
         ipcRenderer.send('settings-saved')
       }, 2000)
     })
+
+    console.log(settingInfo?.appTitle)
   }, [])
   return (
     <>
@@ -162,15 +167,37 @@ const Settings = ({ settingModalRef }) => {
           </Grid>
 
           <Grid item xs={7}>
-            <TextField
-              helperText="App Title"
-              value={appTitle}
-              onChange={(e) => setAppTitle(e.target.value)}
-            />
+            {/* <Typography variant="h6">Setting:{settingInfo?.appTitle}</Typography> */}
+            <Stack flexDirection={'column'}>
+              <TextField
+                helperText="Login Title"
+                value={loginTitle}
+                onChange={(e) => setLoginTitle(e.target.value)}
+              />
 
-            <Button variant="contained" color="warning" onClick={saveSettings}>
-              Save settings
-            </Button>
+              <TextField
+                type="color"
+                value={loginBgColor}
+                onChange={(e) => setLoginBgColor(e.target.value)}
+              />
+
+              <TextField
+                helperText="App Title"
+                value={appTitle}
+                onChange={(e) => setAppTitle(e.target.value)}
+              />
+
+              <TextField
+                type="image"
+                helperText="Logo Title"
+                value={logoDir}
+                onChange={(e) => setLogoDir(e.target.value)}
+              />
+
+              <Button variant="contained" color="warning" onClick={saveSettings}>
+                Save settings
+              </Button>
+            </Stack>
           </Grid>
         </Grid>
         <ToastContainer

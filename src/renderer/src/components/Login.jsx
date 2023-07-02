@@ -2,7 +2,7 @@ import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const Login = ({ setIsLogin }) => {
+const Login = ({ setIsLogin, settingsInfo }) => {
   const userRef = useRef()
   const pwdRef = useRef()
 
@@ -44,7 +44,15 @@ const Login = ({ setIsLogin }) => {
   }, [])
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: settingsInfo?.loginBgColor
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -54,7 +62,9 @@ const Login = ({ setIsLogin }) => {
           gap: 2
         }}
       >
-        <Typography variant="h3">Dental Clinic Program</Typography>
+        <Typography variant="h3">
+          {settingsInfo?.loginTitle ? settingsInfo?.loginTitle : 'Default : Dental Clinic Program'}
+        </Typography>
 
         <TextField
           type="text"

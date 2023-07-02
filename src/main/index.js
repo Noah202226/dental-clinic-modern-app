@@ -98,7 +98,7 @@ app.on('window-all-closed', () => {
 ipcMain.on('settings-saved', () => {
   // Relaunch the app to apply the updated settings
   app.relaunch()
-  app.quit()
+  app.exit()
 })
 
 // In this file you can include the rest of your app"s specific main process
@@ -116,7 +116,17 @@ ipcMain.on('get-settings', async (e, args) => {
   }
 })
 ipcMain.on('new-setting', async (e, args) => {
-  const newSetting = await SettingsData.findByIdAndUpdate(args.id, { appTitle: args.appTitle })
+  console.log(args)
+  try {
+    const stat = await SettingsData.findByIdAndUpdate(args.id, {
+      appTitle: args.appTitle,
+      loginBgColor: args.loginBgColor
+    })
+    console.log(stat)
+    e.reply('settings-saved')
+  } catch (e) {
+    console.log(e)
+  }
 })
 
 // users

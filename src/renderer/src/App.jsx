@@ -4,11 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 
 function App() {
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin, setIsLogin] = useState(false)
 
   const ipcRenderer = window.ipcRenderer
 
   const exitRef = useRef()
+
+  // settings
+  const [settingInfo, setSettingInfo] = useState()
 
   const exitApp = () => {
     ipcRenderer.send('exit-app')
@@ -16,6 +19,14 @@ function App() {
 
   useEffect(() => {
     ipcRenderer.on('closing-app', () => exitRef.current.showModal())
+
+    ipcRenderer.send('get-settings')
+
+    ipcRenderer.on('settings-data', (e, args) => {
+      const settingsData = JSON.parse(args)
+
+      setSettingInfo(settingsData[0])
+    })
   }, [])
 
   return (
@@ -40,7 +51,11 @@ function App() {
           </Button>
         </Stack>
       </dialog>
-      {isLogin ? <Home /> : <Login setIsLogin={setIsLogin} />}
+      {isLogin ? (
+        <Home settingsInfo={settingInfo} />
+      ) : (
+        <Login setIsLogin={setIsLogin} settingsInfo={settingInfo} />
+      )}
     </Box>
   )
 }
