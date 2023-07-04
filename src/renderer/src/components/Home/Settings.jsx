@@ -1,12 +1,4 @@
-import {
-  Delete,
-  DeleteForever,
-  Save,
-  SaveAlt,
-  SaveRounded,
-  Visibility,
-  VisibilityOff
-} from '@mui/icons-material'
+import { DeleteForever, Save, Visibility, VisibilityOff } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -30,10 +22,55 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
+import image1 from '../../../../../uploads/image.jpg'
+
 const Settings = ({ settingModalRef, settingInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [imageData, setImageData] = useState(null)
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0]
+    setSelectedFile(file)
+  }
+
+  const handleUpload = () => {
+    if (!selectedFile) {
+      return
+    }
+
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+      const base64Image = reader.result.toString()
+
+      ipcRenderer.send('upload-image', { image: base64Image, imageName: selectedFile.name })
+    }
+
+    reader.readAsDataURL(selectedFile)
+  }
+
+  // New user
+
+  const newUserFormRef = useRef()
+
+  const [newUserName, setNewUserName] = useState()
+  const [newUserPass, setNewUserPass] = useState()
+  const [newUserAccountType, setNewUserAccountType] = useState()
+
+  const submitNewUser = () => {
+    const newUserData = {
+      name: newUserName,
+      pwd: newUserPass,
+      accountType: newUserAccountType
+    }
+
+    ipcRenderer.send('new-user', newUserData)
+  }
+
   // const [settingInfo, setSettingInfo] = useState()
+
   const [settingsID, setsettingsID] = useState()
   const [appTitle, setAppTitle] = useState()
   const [loginBgColor, setLoginBgColor] = useState()
@@ -41,6 +78,8 @@ const Settings = ({ settingModalRef, settingInfo }) => {
   const [container1, setContainer1] = useState()
   const [container2, setContainer2] = useState()
   const [logoDir, setLogoDir] = useState()
+
+  const [selectedImage, setSelectedImage] = useState(null)
 
   const modifyUserModalRef = useRef()
   const [users, setUsers] = useState([])
@@ -120,7 +159,17 @@ const Settings = ({ settingModalRef, settingInfo }) => {
       }, 2000)
     })
 
-    console.log(settingInfo?.appTitle)
+    ipcRenderer.on('new-user-saved', (e, args) => {
+      toast.success(args, { position: 'bottom-right', containerId: 'settingsNofication' })
+
+      ipcRenderer.send('get-users')
+
+      setNewUserName('')
+      setNewUserPass('')
+      setNewUserAccountType('')
+
+      newUserFormRef.current.close()
+    })
   }, [])
   return (
     <>
@@ -130,10 +179,21 @@ const Settings = ({ settingModalRef, settingInfo }) => {
       >
         <Typography>Settings</Typography>
 
+        <Button variant="contained" color="error" onClick={() => settingModalRef.current.close()}>
+          Close
+        </Button>
+
         <Grid container>
           <Grid item xs={4}>
             <Paper>
               <Typography variant="h5">All Users</Typography>
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => newUserFormRef.current.showModal()}
+              >
+                Add User
+              </Button>
 
               {users.map((user) => (
                 <Card
@@ -188,11 +248,27 @@ const Settings = ({ settingModalRef, settingInfo }) => {
               />
 
               <TextField
-                type="image"
+                type="file"
                 helperText="Logo Title"
-                value={logoDir}
-                onChange={(e) => setLogoDir(e.target.value)}
+                // value={'logo'}
+                onChange={(e) => console.log(e.target.value)}
               />
+
+              <Typography variant="body">Logo Path:{logoDir}</Typography>
+
+              {selectedImage && (
+                <img src={logoDir} alt="Preview" style={{ width: '200px', height: '200px' }} />
+              )}
+
+              {imageData ? <img src={imageData} alt="Uploaded Image" /> : <p>Loading image...</p>}
+
+              <img src={image1} alt="require image" />
+
+              <input type="file" accept="image/*" onChange={handleFileUpload} />
+
+              <Button variant="contained" color="warning" onClick={handleUpload}>
+                Upload
+              </Button>
 
               <Button variant="contained" color="warning" onClick={saveSettings}>
                 Save settings
@@ -279,15 +355,43 @@ const Settings = ({ settingModalRef, settingInfo }) => {
             Save
             <Save sx={{ p: 1 }} />
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => modifyUserModalRef.current.close()}
-          >
+          <Button variant="contained" color="error" onClick={() => deleteUser(userInfo._id)}>
             Delete
             <DeleteForever sx={{ p: 1 }} />
           </Button>
         </Stack>
+      </dialog>
+
+      {/* New user */}
+
+      <dialog ref={newUserFormRef}>
+        <Typography variant="h3">New User form</Typography>
+        <Button variant="contained" color="error" onClick={() => newUserFormRef.current.close()}>
+          Cancel
+        </Button>
+
+        <TextField
+          type="text"
+          label="User"
+          value={newUserName}
+          onChange={(e) => setNewUserName(e.target.value)}
+        />
+        <TextField
+          type="password"
+          label="Password"
+          value={newUserPass}
+          onChange={(e) => setNewUserPass(e.target.value)}
+        />
+        <TextField
+          type="text"
+          label="user"
+          value={newUserAccountType}
+          onChange={(e) => setNewUserAccountType(e.target.value)}
+        />
+
+        <Button variant="contained" color="info" onClick={submitNewUser}>
+          Submit
+        </Button>
       </dialog>
     </>
   )

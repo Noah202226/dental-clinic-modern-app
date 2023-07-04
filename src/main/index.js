@@ -1,11 +1,54 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Menu, protocol } from 'electron'
 import { join } from 'path'
+
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+// file upload
+import multer from 'multer'
+import fs from 'fs-extra'
 
 // Mongodb
 import db from './mongoConnection'
 import { Expenses, InstallmentPatient, NewPatient, NewSale, SettingsData, Users } from './shemas'
+
+// Image upload
+const upload = multer({ dest: 'uploads/' })
+
+ipcMain.on('upload-image', (event, args) => {
+  const imageBuffer = Buffer.from(args.image.split(',')[1], 'base64')
+  const targetFolder = join(app.getAppPath(), 'uploads')
+  const targetPath = join(targetFolder, args.imageName)
+
+  fs.ensureDir(targetFolder)
+    .then(() => {
+      fs.writeFile(targetPath, imageBuffer, (err) => {
+        if (err) {
+          console.error('Error saving image:', err)
+          event.sender.send('upload-error', 'Error saving image.')
+        } else {
+          event.sender.send('upload-success')
+        }
+      })
+    })
+    .catch((err) => {
+      console.error('Error creating directory:', err)
+      event.sender.send('upload-error', 'Error creating directory.')
+    })
+})
+
+ipcMain.on('get-image', (event, imagePath) => {
+  const imageFile = join(app.getAppPath(), imagePath)
+
+  fs.readFile(imageFile, (err, data) => {
+    if (err) {
+      console.error('Error reading image file:', err)
+      event.sender.send('get-image-error', 'Error reading image file.')
+    } else {
+      event.sender.send('get-image-success', data)
+    }
+  })
+})
 
 function createWindow() {
   // Create the browser window.
@@ -135,6 +178,18 @@ ipcMain.on('check-user', async (e, args) => {
 
   e.reply('validated-user', user)
 })
+ipcMain.on('new-user', async (e, args) => {
+  console.log(args)
+  try {
+    const newUser = new Users(args)
+
+    await newUser.save()
+
+    e.reply('new-user-saved', 'New user saved.')
+  } catch (e) {
+    console.log(e)
+  }
+})
 ipcMain.on('get-users', async (e, args) => {
   const users = await Users.find()
 
@@ -163,21 +218,6 @@ ipcMain.on('delete-user', async (e, args) => {
     e.reply('deleted-user', 'User deleted.')
   } catch (e) {
     console.log(e)
-  }
-})
-// New patient
-ipcMain.on('new-user', async (e, args) => {
-  const newUser = new Users(args)
-
-  try {
-    await newUser.save()
-
-    console.log('User saved successfully!')
-    e.reply('new-patient-record-saved', 'New Patient Record Saved.')
-    // Handle any success messages or redirects
-  } catch (error) {
-    console.error('Error saving user:', error)
-    // Handle any error messages or error handling
   }
 })
 
