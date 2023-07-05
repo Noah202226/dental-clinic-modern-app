@@ -1,12 +1,9 @@
 import { DeleteForever, Save, Visibility, VisibilityOff } from '@mui/icons-material'
 import {
-  Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   Grid,
   IconButton,
@@ -22,34 +19,11 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-import image1 from '../../../../../uploads/image.jpg'
-
 const Settings = ({ settingModalRef, settingInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
   const [selectedFile, setSelectedFile] = useState(null)
   const [imageData, setImageData] = useState(null)
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0]
-    setSelectedFile(file)
-  }
-
-  const handleUpload = () => {
-    if (!selectedFile) {
-      return
-    }
-
-    const reader = new FileReader()
-
-    reader.onloadend = () => {
-      const base64Image = reader.result.toString()
-
-      ipcRenderer.send('upload-image', { image: base64Image, imageName: selectedFile.name })
-    }
-
-    reader.readAsDataURL(selectedFile)
-  }
 
   // New user
 

@@ -27,6 +27,7 @@ import SalesInfo from './Home/SalesInfo'
 import { ToastContainer, toast } from 'react-toastify'
 import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
 import Settings from './Home/Settings'
+import ExportToExcelButton from './Home/ExportToExcelButton'
 
 const Home = ({ settingsInfo, userInfo }) => {
   const ipcRenderer = window.ipcRenderer
@@ -278,6 +279,8 @@ const Home = ({ settingsInfo, userInfo }) => {
               <ImportExport />
               Export To Excel
             </Button>
+
+            <ExportToExcelButton sales={filterRows} expenses={filterExpenseRows} />
           </Stack>
         </Stack>
 
