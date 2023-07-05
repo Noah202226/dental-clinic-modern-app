@@ -18,7 +18,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const PatientInfo = ({ patients }) => {
+const PatientInfo = ({ patients, settingsInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
   const [dateNow, setDateNow] = useState('')
@@ -308,7 +308,11 @@ const PatientInfo = ({ patients }) => {
   return (
     <>
       <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-        <Typography variant="h5">Patient Records</Typography>
+        <Typography variant="h5">
+          {patients?.length > 0
+            ? `${settingsInfo?.containerTitle2}`
+            : settingsInfo?.containerTitle2}
+        </Typography>
         <Button
           variant="contained"
           size="small"
@@ -519,36 +523,46 @@ const PatientInfo = ({ patients }) => {
         ref={patientInfoRef}
         style={{ position: 'relative', zIndex: 9999999, width: 1350, height: 700 }}
       >
-        <Grid container>
-          <Grid item xs={5}>
+        <Grid container spacing={1}>
+          <Grid item xs={5} sx={{ background: 'rgba(50,200,150, 0.5)', p: 0.5, borderRadius: 1 }}>
             <Typography variant="h4">Patient Transactions</Typography>
             <Typography variant="h6">No. of transaction : {patientTransactions.length}</Typography>
 
-            {patientTransactions.map((tx) => (
-              <Card key={tx._id}>
-                <Typography variant="h6" fontSize={15}>
-                  Date: {tx.patientName}
-                </Typography>
-                <Typography variant="h6" fontSize={15}>
-                  Date:{' '}
-                  {new Date(tx.dateTransact).toLocaleString(undefined, {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </Typography>
-                <Typography variant="h6" fontSize={14}>
-                  Amount: {tx.amountPaid}
-                </Typography>
-                <Typography variant="h6" fontSize={14}>
-                  Treatment Rendered: {tx.treatmentRendered}
-                </Typography>
-                <Typography variant="h6" fontSize={14}>
-                  Treatment Type: {tx.treatmentType}
-                </Typography>
-              </Card>
-            ))}
+            <Paper
+              className="scrollable-div"
+              sx={{
+                background: 'rgba(50,200,150, 0.5)',
+                padding: 0.1,
+                overflow: 'auto',
+                height: 583
+              }}
+            >
+              {patientTransactions.map((tx) => (
+                <Card key={tx._id} sx={{ mb: 0.5, p: 0.5 }}>
+                  {/* <Typography variant="h6" fontSize={15}>
+                    Date: {tx.patientName}
+                  </Typography> */}
+                  <Typography variant="h6" fontSize={15}>
+                    Date:{' '}
+                    {new Date(tx.dateTransact).toLocaleString(undefined, {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </Typography>
+                  <Typography variant="h6" fontSize={14}>
+                    Amount: {tx.amountPaid}
+                  </Typography>
+                  <Typography variant="h6" fontSize={14}>
+                    Treatment Rendered: {tx.treatmentRendered}
+                  </Typography>
+                  <Typography variant="h6" fontSize={14}>
+                    Treatment Type: {tx.treatmentType}
+                  </Typography>
+                </Card>
+              ))}
+            </Paper>
           </Grid>
 
           <Grid item xs={7}>
@@ -732,7 +746,7 @@ const PatientInfo = ({ patients }) => {
               />
             </Stack>
 
-            <Card sx={{ p: 1 }}>
+            <Card sx={{ background: 'rgba(50,200,150, 0.5)', p: 0.5, borderRadius: 1 }}>
               <Stack
                 flexDirection={'row'}
                 alignItems={'start'}

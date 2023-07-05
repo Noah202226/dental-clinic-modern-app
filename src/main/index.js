@@ -163,7 +163,10 @@ ipcMain.on('new-setting', async (e, args) => {
   try {
     const stat = await SettingsData.findByIdAndUpdate(args.id, {
       appTitle: args.appTitle,
-      loginBgColor: args.loginBgColor
+      loginBgColor: args.loginBgColor,
+      loginTitle: args.loginTitle,
+      containerTitle1: args.containerTitle1,
+      containerTitle2: args.containerTitle2
     })
     console.log(stat)
     e.reply('settings-saved')
@@ -176,7 +179,7 @@ ipcMain.on('new-setting', async (e, args) => {
 ipcMain.on('check-user', async (e, args) => {
   const user = await Users.findOne({ name: args.name, pwd: args.pwd })
 
-  e.reply('validated-user', user)
+  e.reply('validated-user', JSON.stringify(user))
 })
 ipcMain.on('new-user', async (e, args) => {
   console.log(args)

@@ -2,7 +2,7 @@ import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const Login = ({ setIsLogin, settingsInfo }) => {
+const Login = ({ setIsLogin, settingsInfo, setUserInfo }) => {
   const userRef = useRef()
   const pwdRef = useRef()
 
@@ -26,14 +26,20 @@ const Login = ({ setIsLogin, settingsInfo }) => {
 
   useEffect(() => {
     ipcRenderer.on('validated-user', (e, args) => {
-      if (args !== null) {
+      const user = JSON.parse(args)
+
+      if (user !== null) {
         toast.success('Successfully login', { position: toast.POSITION.BOTTOM_RIGHT })
 
         setTimeout(() => {
+          setUserInfo(user)
           setIsLogin(true)
-        }, 4000)
+        }, 3000)
       } else {
-        toast.error('Login failed, User not found!', { position: toast.POSITION.BOTTOM_RIGHT })
+        console.log(args)
+        toast.error('Login failed, User not found!' + args.name, {
+          position: toast.POSITION.BOTTOM_RIGHT
+        })
         setIsLoading(false)
       }
     })

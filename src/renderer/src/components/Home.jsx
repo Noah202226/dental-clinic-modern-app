@@ -28,7 +28,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
 import Settings from './Home/Settings'
 
-const Home = ({ settingsInfo }) => {
+const Home = ({ settingsInfo, userInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
   const [patientsRecord, setPatientsRecord] = useState([])
@@ -65,8 +65,8 @@ const Home = ({ settingsInfo }) => {
     setPage(0)
   }
   // expense
-  const handleChangePageExpense = (event, newPage) => {
-    setPage2(newPage)
+  const handleChangePageExpense = (event, newPage2) => {
+    setPage2(newPage2)
   }
 
   const handleChangeRowsPerPageExpense = (event) => {
@@ -197,7 +197,7 @@ const Home = ({ settingsInfo }) => {
 
   return (
     <Stack>
-      <Header settingsData={settingsInfo} />
+      <Header settingsData={settingsInfo} userInfo={userInfo} />
 
       <Grid container spacing={1} p={1}>
         <Grid item xs={8}>
@@ -209,6 +209,8 @@ const Home = ({ settingsInfo }) => {
             transactionReportRef={transactionReportRef}
             expenseModalRef={expenseModalRef}
             settingModalRef={settingModalRef}
+            settingsInfo={settingsInfo}
+            userInfo={userInfo}
           />
         </Grid>
       </Grid>
@@ -217,11 +219,15 @@ const Home = ({ settingsInfo }) => {
         <Grid item xs={6}>
           <PatientList
             patients={search === '' ? installmentPatients : filteredInstallmentPatientsData}
+            settingsInfo={settingsInfo}
           />
         </Grid>
 
         <Grid item xs={6}>
-          <PatientInfo patients={search === '' ? patientsRecord : filterPatientsData} />
+          <PatientInfo
+            patients={search === '' ? patientsRecord : filterPatientsData}
+            settingsInfo={settingsInfo}
+          />
         </Grid>
       </Grid>
 

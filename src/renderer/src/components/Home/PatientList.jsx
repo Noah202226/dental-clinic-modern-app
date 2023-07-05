@@ -14,7 +14,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
-const PatientList = ({ patients }) => {
+const PatientList = ({ patients, settingsInfo }) => {
   const ipcRenderer = window.ipcRenderer
 
   // For card gives rendering
@@ -283,7 +283,9 @@ const PatientList = ({ patients }) => {
     <>
       <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
         <Typography variant="h5">
-          {patients?.length > 0 ? 'Patient Lists' : 'Patient List'}
+          {patients?.length > 0
+            ? `${settingsInfo?.containerTitle1}`
+            : settingsInfo?.containerTitle1}
         </Typography>
         <Button
           size="small"
@@ -506,58 +508,41 @@ const PatientList = ({ patients }) => {
         ref={patientInfoRef}
         style={{ position: 'relative', zIndex: 9999999, width: 1250, height: 700 }}
       >
-        <Grid container>
-          <Grid item xs={5}>
-            <Card sx={{ p: 1 }}>
-              <Stack flexDirection={'row'} justifyContent={'space-between'}>
-                <Typography variant="h6">New Give</Typography>
-
-                <Button variant="contained" color="info" onClick={saveNewGive}>
-                  Submit
-                </Button>
-              </Stack>
-
-              <Stack flexDirection={'row'} justifyContent={'space-between'}>
-                <TextField
-                  type="date"
-                  label="Date"
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                  value={dateNow}
-                  onChange={(e) => setDateNow(e.target.value)}
-                />
-                <TextField
-                  type="number"
-                  label="Amount"
-                  value={newTransactionAmount}
-                  onChange={(e) => setNewTransactionAmount(e.target.value)}
-                />
-              </Stack>
-
-              <Stack flexDirection={'row'} justifyContent={'space-between'}>
-                <Typography variant="body">No. of Gives: {gives.length}</Typography>
-                <Typography variant="body">
-                  Total amount given: {gives?.reduce((a, b) => a + parseInt(b.amountGive), 0)}
-                </Typography>
-                <Typography variant="body">Remaining amount: {remainingBal}</Typography>
-              </Stack>
-            </Card>
-
+        <Grid container spacing={1}>
+          <Grid item xs={5} sx={{ background: 'rgba(50,200,150, 0.5)', p: 0.5, borderRadius: 1 }}>
             <Typography variant="h6">Patient Gives</Typography>
+            <Stack flexDirection={'row'} justifyContent={'space-between'}>
+              <Typography variant="body">No. of Gives: {gives.length}</Typography>
+              <Typography variant="body">
+                Total amount given: {gives?.reduce((a, b) => a + parseInt(b.amountGive), 0)}
+              </Typography>
+              <Typography variant="body">Remaining amount: {remainingBal}</Typography>
+            </Stack>
 
-            {gives.map((give) => {
-              return (
-                <Card key={(id += 1)}>
-                  <Typography variant="h6">{give.givenDate}</Typography>
-                  <Typography variant="h6">{give.amountGive}</Typography>
-                </Card>
-              )
-            })}
+            <Paper
+              className="scrollable-div"
+              sx={{
+                background: 'rgba(50,200,150, 0.5)',
+                padding: 0.1,
+                overflow: 'auto',
+                height: 583,
+                mt: 2
+              }}
+            >
+              {gives.map((give) => {
+                return (
+                  <Card key={(id += 1)} sx={{ mb: 0.5, p: 0.5 }}>
+                    <Typography variant="h6">{give.givenDate}</Typography>
+                    <Typography variant="h6">{give.amountGive}</Typography>
+                  </Card>
+                )
+              })}
+            </Paper>
           </Grid>
 
           <Grid item xs={7}>
             <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
-              <Typography variant="h6">Patient Transactions - {patientID}</Typography>
+              <Typography variant="h5">Patient Information</Typography>
               <Button
                 variant="contained"
                 color="error"
@@ -567,8 +552,9 @@ const PatientList = ({ patients }) => {
               </Button>
             </Stack>
 
-            <Stack>
+            <Stack sx={{ mt: 1 }}>
               <Typography variant="h6">
+                Date of transaction:
                 {new Date(dateTransact).toLocaleString(undefined, {
                   weekday: 'long',
                   year: 'numeric',
@@ -578,11 +564,11 @@ const PatientList = ({ patients }) => {
               </Typography>
             </Stack>
 
-            <Stack sx={{ width: '100%', height: 150 }}>
+            {/* <Stack sx={{ width: '100%', height: 150 }}>
               <img src="../../resources/dentist.svg" alt="sample image" />
-            </Stack>
+            </Stack> */}
 
-            <Stack>
+            <Stack spacing={2} mt={1}>
               <TextField
                 type="text"
                 label="Patient Name"
@@ -608,9 +594,9 @@ const PatientList = ({ patients }) => {
 
             <Stack
               flexDirection={'row'}
-              alignItems={'start'}
+              alignItems={'center'}
               justifyContent={'space-between'}
-              mb={1}
+              padding={2}
             >
               <TextField
                 type="text"
@@ -623,13 +609,19 @@ const PatientList = ({ patients }) => {
               <TextField
                 type="text"
                 label="Treatment Type"
+                className="capitalize"
                 value={treatmentType}
                 onChange={(e) => setTreatmentType(e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
             </Stack>
 
-            <Stack>
+            <Stack
+              flexDirection={'row'}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+              padding={2}
+            >
               <TextField
                 type="number"
                 label="Service Price"
@@ -646,12 +638,46 @@ const PatientList = ({ patients }) => {
               />
             </Stack>
 
-            <Button variant="contained" color="info" onClick={updateData}>
-              Update
-            </Button>
-            <Button variant="contained" color="info" onClick={deleteInstallmentPatient}>
-              Delete
-            </Button>
+            <Stack
+              flexDirection={'row'}
+              alignItems={'center'}
+              justifyContent={'flex-end'}
+              padding={2}
+            >
+              <Button variant="contained" color="info" onClick={updateData} sx={{ mr: 2 }}>
+                Update
+              </Button>
+              <Button variant="contained" color="error" onClick={deleteInstallmentPatient}>
+                Delete
+              </Button>
+            </Stack>
+
+            <Card sx={{ background: 'rgba(50,200,150, 0.5)', p: 1, borderRadius: 1, mt: 2 }}>
+              <Stack flexDirection={'row'} justifyContent={'space-between'}>
+                <Typography variant="h6">New Give</Typography>
+
+                <Button variant="contained" color="info" onClick={saveNewGive}>
+                  Submit
+                </Button>
+              </Stack>
+
+              <Stack flexDirection={'row'} justifyContent={'space-between'}>
+                <TextField
+                  type="date"
+                  label="Date"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  value={dateNow}
+                  onChange={(e) => setDateNow(e.target.value)}
+                />
+                <TextField
+                  type="number"
+                  label="Amount"
+                  value={newTransactionAmount}
+                  onChange={(e) => setNewTransactionAmount(e.target.value)}
+                />
+              </Stack>
+            </Card>
           </Grid>
         </Grid>
 

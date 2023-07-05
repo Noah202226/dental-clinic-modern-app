@@ -93,7 +93,14 @@ const Settings = ({ settingModalRef, settingInfo }) => {
 
   const saveSettings = () => {
     console.log(settingInfo._id)
-    ipcRenderer.send('new-setting', { id: settingsID, appTitle, loginBgColor })
+    ipcRenderer.send('new-setting', {
+      id: settingsID,
+      appTitle,
+      loginBgColor,
+      loginTitle,
+      containerTitle1: container1,
+      containerTitle2: container2
+    })
   }
 
   const updateUserInfo = (id) => {
@@ -115,8 +122,8 @@ const Settings = ({ settingModalRef, settingInfo }) => {
     setAppTitle(settingInfo?.appTitle)
     setLoginBgColor(settingInfo?.loginBgColor)
     setLoginTitle(settingInfo?.loginTitle)
-    setContainer1(settingInfo?.container1)
-    setContainer2(settingInfo?.container2)
+    setContainer1(settingInfo?.containerTitle1)
+    setContainer2(settingInfo?.containerTitle2)
     setLogoDir(settingInfo?.logoDir)
   }, [settingInfo])
   useEffect(() => {
@@ -177,24 +184,36 @@ const Settings = ({ settingModalRef, settingInfo }) => {
         ref={settingModalRef}
         style={{ position: 'relative', zIndex: 9999999, width: 1200, height: 700 }}
       >
-        <Typography>Settings</Typography>
+        <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} p={1}>
+          <Typography variant="h4">Settings</Typography>
 
-        <Button variant="contained" color="error" onClick={() => settingModalRef.current.close()}>
-          Close
-        </Button>
+          <Button variant="contained" color="error" onClick={() => settingModalRef.current.close()}>
+            Close
+          </Button>
+        </Stack>
 
-        <Grid container>
-          <Grid item xs={4}>
-            <Paper>
+        <Grid container spacing={1}>
+          <Grid item xs={4} sx={{ backgroundColor: 'cyan' }}>
+            <Stack flexDirection={'row'} justifyContent={'space-between'} p={1}>
               <Typography variant="h5">All Users</Typography>
               <Button
+                size="small"
                 variant="contained"
                 color="info"
                 onClick={() => newUserFormRef.current.showModal()}
               >
                 Add User
               </Button>
-
+            </Stack>
+            <Paper
+              className="scrollable-div"
+              sx={{
+                padding: 0.5,
+                overflow: 'auto',
+                height: 550,
+                background: 'rgba(50,200,150, 0.5)'
+              }}
+            >
               {users.map((user) => (
                 <Card
                   key={user._id}
@@ -228,50 +247,55 @@ const Settings = ({ settingModalRef, settingInfo }) => {
 
           <Grid item xs={7}>
             {/* <Typography variant="h6">Setting:{settingInfo?.appTitle}</Typography> */}
-            <Stack flexDirection={'column'}>
-              <TextField
-                helperText="Login Title"
-                value={loginTitle}
-                onChange={(e) => setLoginTitle(e.target.value)}
-              />
+            <Stack flexDirection={'column'} alignItems={'center'} justifyContent={'space-between'}>
+              <Stack flexDirection={'row'} justifyContent={'space-between'} width={'100%'}>
+                <TextField
+                  fullWidth
+                  label="Login Title"
+                  value={loginTitle}
+                  onChange={(e) => setLoginTitle(e.target.value)}
+                  sx={{ m: 1 }}
+                />
+
+                <TextField
+                  type="color"
+                  sx={{ m: 1 }}
+                  fullWidth
+                  label="Login Background Color"
+                  value={loginBgColor}
+                  onChange={(e) => setLoginBgColor(e.target.value)}
+                />
+              </Stack>
 
               <TextField
-                type="color"
-                value={loginBgColor}
-                onChange={(e) => setLoginBgColor(e.target.value)}
-              />
-
-              <TextField
-                helperText="App Title"
+                sx={{ m: 1 }}
+                fullWidth
+                label="App Title"
                 value={appTitle}
                 onChange={(e) => setAppTitle(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
-
               <TextField
-                type="file"
-                helperText="Logo Title"
-                // value={'logo'}
-                onChange={(e) => console.log(e.target.value)}
+                sx={{ m: 1 }}
+                fullWidth
+                label="Container 1 Title"
+                value={container1}
+                onChange={(e) => setContainer1(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
+              <TextField
+                sx={{ m: 1 }}
+                fullWidth
+                label="Container 2 Title"
+                value={container2}
+                onChange={(e) => setContainer2(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Stack>
 
-              <Typography variant="body">Logo Path:{logoDir}</Typography>
-
-              {selectedImage && (
-                <img src={logoDir} alt="Preview" style={{ width: '200px', height: '200px' }} />
-              )}
-
-              {imageData ? <img src={imageData} alt="Uploaded Image" /> : <p>Loading image...</p>}
-
-              <img src={image1} alt="require image" />
-
-              <input type="file" accept="image/*" onChange={handleFileUpload} />
-
-              <Button variant="contained" color="warning" onClick={handleUpload}>
-                Upload
-              </Button>
-
-              <Button variant="contained" color="warning" onClick={saveSettings}>
-                Save settings
+            <Stack flexDirection={'row'}>
+              <Button variant="contained" color="info" onClick={saveSettings}>
+                Save settings (App will restart)
               </Button>
             </Stack>
           </Grid>

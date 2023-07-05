@@ -2,11 +2,18 @@ import { Button, Stack } from '@mui/material'
 import React from 'react'
 import { toast } from 'react-toastify'
 
-const Actions = ({ transactionReportRef, expenseModalRef, settingModalRef }) => {
+const Actions = ({
+  transactionReportRef,
+  expenseModalRef,
+  settingModalRef,
+  settingsInfo,
+  userInfo
+}) => {
   // Export functions
   const notyetworking = () => {
     console.log('.')
-    toast.warn('Its not yet work. Sorry', {
+
+    toast.warn('You are not allowed to access setting sections.', {
       position: 'top-center',
       containerId: 'homeToastifyContainer'
     })
@@ -33,7 +40,11 @@ const Actions = ({ transactionReportRef, expenseModalRef, settingModalRef }) => 
       <Button
         variant="contained"
         color="warning"
-        onClick={() => settingModalRef.current.showModal()}
+        onClick={
+          userInfo?.accountType === 'admin'
+            ? () => settingModalRef.current.showModal()
+            : notyetworking
+        }
       >
         Settings
       </Button>

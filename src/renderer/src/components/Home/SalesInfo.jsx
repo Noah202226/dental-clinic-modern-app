@@ -8,6 +8,7 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
   const [patientName, setpatientName] = useState()
   const [treatmentRendered, settreatmentRendered] = useState()
   const [treatmentType, settreatmentType] = useState()
+  const [saleAmount, setSaleAmount] = useState()
 
   const deleteTx = () => {
     ipcRenderer.send('delete-sale-tx', txID)
@@ -16,7 +17,8 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
     const newData = {
       patientName,
       treatmentRendered,
-      treatmentType
+      treatmentType,
+      amountPaid: saleAmount
     }
     ipcRenderer.send('update-sale-tx', { txID, newData })
   }
@@ -31,6 +33,7 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
         setpatientName(tx.patientName)
         settreatmentRendered(tx.treatmentRendered)
         settreatmentType(tx.treatmentType)
+        setSaleAmount(tx.amountPaid)
       })
 
       ipcRenderer.on('tx-deleted', (e, args) => {
@@ -54,8 +57,17 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
   }, [txID])
 
   return (
-    <dialog ref={saleTransactionRef}>
-      <Typography>Sale transaction info - txID: {txID}</Typography>
+    <dialog ref={saleTransactionRef} style={{ padding: 10 }}>
+      <Stack flexDirection={'row'} justifyContent={'space-between'}>
+        <Typography variant="h6">Sale transaction info</Typography>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={() => saleTransactionRef.current.close()}
+        >
+          Close
+        </Button>
+      </Stack>
 
       <TextField
         type="text"
@@ -74,6 +86,12 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
         label="Treatment Type"
         value={treatmentType}
         onChange={(e) => settreatmentType(e.target.value)}
+      />
+      <TextField
+        type="number"
+        label="Amount"
+        value={saleAmount}
+        onChange={(e) => setSaleAmount(e.target.value)}
       />
 
       <Stack flexDirection={'row'}>

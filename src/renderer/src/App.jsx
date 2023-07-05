@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 
 function App() {
-  const [isLogin, setIsLogin] = useState(true)
-  const [appTitle, setAppTitle] = useState()
+  const [isLogin, setIsLogin] = useState(false)
+  const [userInfo, setUserInfo] = useState()
 
   const ipcRenderer = window.ipcRenderer
 
@@ -53,9 +53,9 @@ function App() {
         </Stack>
       </dialog>
       {isLogin ? (
-        <Home settingsInfo={settingInfo} />
+        <Home settingsInfo={settingInfo} userInfo={userInfo} />
       ) : (
-        <Login setIsLogin={setIsLogin} settingsInfo={settingInfo} />
+        <Login setIsLogin={setIsLogin} settingsInfo={settingInfo} setUserInfo={setUserInfo} />
       )}
     </Box>
   )

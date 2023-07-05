@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import icon from '../../assets/dentist.svg'
 import { useEffect, useState } from 'react'
 
-const Header = ({ settingsData }) => {
+const Header = ({ settingsData, userInfo }) => {
   const [dateTime, setDateTime] = useState(
     Date.now().toLocaleString(undefined, {
       weekday: 'long',
@@ -47,9 +47,14 @@ const Header = ({ settingsData }) => {
           </Typography>
         </Stack>
 
-        <Typography variant="h5" fontSize={29} padding={1}>
-          {dateTime}
-        </Typography>
+        <Stack>
+          <Typography variant="h5" fontSize={29} padding={1}>
+            {dateTime}
+          </Typography>
+          <Typography variant="body" className="capitalize" textAlign={'end'}>
+            User: {userInfo?.name}
+          </Typography>
+        </Stack>
       </Stack>
     </Box>
   )

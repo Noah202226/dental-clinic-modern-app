@@ -54,8 +54,8 @@ const ExpenseSchema = new Schema({
 const SettingSchema = new Schema({
   logoDir: String,
   appTitle: String,
-  container1Title: String,
-  container2Title: String,
+  containerTitle1: String,
+  containerTitle2: String,
   loginTitle: String,
   loginBgColor: String
 })
