@@ -505,11 +505,20 @@ const PatientInfo = ({ patients, settingsInfo }) => {
               <MenuItem value={20}>Twenty</MenuItem>
               <MenuItem value={30}>Thirty</MenuItem> */}
 
-                {options.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
+                {options.length > 0 ? (
+                  options.map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value={'With Flouride'}>With Flouride</option>
+                    <option value={'Without Flouride'}>Without Flouride</option>
+                    <option value={'Medical Certificate'}>Medical Certificate</option>
+                    <option value={'Moral Band'}>Moral Band</option>
+                  </>
+                )}
               </Select>
 
               <FormHelperText>Treatment Type</FormHelperText>
@@ -821,11 +830,20 @@ const PatientInfo = ({ patients, settingsInfo }) => {
                     value={treatmentType}
                     onChange={(e) => settreatmentType(e.target.value)}
                   >
-                    {options.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
+                    {options.length > 0 ? (
+                      options.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value={'With Flouride'}>With Flouride</option>
+                        <option value={'Without Flouride'}>Without Flouride</option>
+                        <option value={'Medical Certificate'}>Medical Certificate</option>
+                        <option value={'Moral Band'}>Moral Band</option>
+                      </>
+                    )}
                   </Select>
 
                   <FormHelperText>Treatment Type</FormHelperText>

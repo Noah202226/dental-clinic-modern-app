@@ -388,34 +388,51 @@ const Settings = ({ settingModalRef, settingInfo }) => {
 
       {/* New user */}
 
-      <dialog ref={newUserFormRef}>
-        <Typography variant="h3">New User form</Typography>
-        <Button variant="contained" color="error" onClick={() => newUserFormRef.current.close()}>
-          Cancel
-        </Button>
+      <dialog ref={newUserFormRef} style={{ padding: 10, width: 500 }}>
+        <Stack flexDirection={'row'} justifyContent={'space-between'} mb={1}>
+          <Typography variant="h4">New User form</Typography>
+          <Button variant="contained" color="error" onClick={() => newUserFormRef.current.close()}>
+            Cancel
+          </Button>
+        </Stack>
 
-        <TextField
-          type="text"
-          label="User"
-          value={newUserName}
-          onChange={(e) => setNewUserName(e.target.value)}
-        />
-        <TextField
-          type="password"
-          label="Password"
-          value={newUserPass}
-          onChange={(e) => setNewUserPass(e.target.value)}
-        />
-        <TextField
-          type="text"
-          label="user"
-          value={newUserAccountType}
-          onChange={(e) => setNewUserAccountType(e.target.value)}
-        />
+        <Stack mb={1}>
+          <TextField
+            type="text"
+            label="User"
+            value={newUserName}
+            onChange={(e) => setNewUserName(e.target.value)}
+            sx={{ mb: 1 }}
+          />
+          <TextField
+            sx={{ mb: 1 }}
+            type="password"
+            label="Password"
+            value={newUserPass}
+            onChange={(e) => setNewUserPass(e.target.value)}
+          />
 
-        <Button variant="contained" color="info" onClick={submitNewUser}>
-          Submit
-        </Button>
+          <FormControl fullWidth sx={{ position: 'relative', zIndex: 2, mb: 1 }}>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              native
+              sx={{ position: 'relative', zIndex: 2, width: 200 }}
+              value={newUserAccountType}
+              onChange={(e) => setNewUserAccountType(e.target.value)}
+            >
+              <option value={'user'}>USER</option>
+              <option value={'admin'}>ADMIN</option>
+            </Select>
+            <FormHelperText>Account Type</FormHelperText>
+          </FormControl>
+        </Stack>
+
+        <Stack mb={1}>
+          <Button variant="contained" color="info" onClick={submitNewUser}>
+            Submit
+          </Button>
+        </Stack>
       </dialog>
     </>
   )

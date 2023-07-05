@@ -53,25 +53,27 @@ const Login = ({ setIsLogin, settingsInfo, setUserInfo }) => {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
-        backgroundColor: settingsInfo?.loginBgColor
+        backgroundColor: settingsInfo?.loginBgColor,
+        gap: 2
       }}
     >
+      <Typography variant="h3">
+        {settingsInfo?.loginTitle ? settingsInfo?.loginTitle : 'Default : Dental Clinic Program'}
+      </Typography>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'space-around',
+          width: '30%',
           gap: 2
         }}
       >
-        <Typography variant="h3">
-          {settingsInfo?.loginTitle ? settingsInfo?.loginTitle : 'Default : Dental Clinic Program'}
-        </Typography>
-
         <TextField
           type="text"
           label="Username"

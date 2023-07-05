@@ -70,7 +70,7 @@ const PatientList = ({ patients, settingsInfo }) => {
       case 'check-up':
         return ['Checkup']
       default:
-        return []
+        return ['With Flouride', 'Without Flouride', 'Medical Certificate', 'Moral Bond']
     }
   }
 
@@ -412,9 +412,15 @@ const PatientList = ({ patients, settingsInfo }) => {
       {/* New Patient Installment */}
       <dialog
         ref={newPatientRef}
-        style={{ position: 'relative', zIndex: 9999999, width: 800, height: 700 }}
+        style={{
+          position: 'relative',
+          zIndex: 9999999,
+          width: 800,
+          height: 700,
+          backgroundImage: 'url("../../resources/dentist.svg")'
+        }}
       >
-        <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'}>
+        <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} p={1}>
           <Typography variant="h4">Patient Transactions</Typography>
           <Button variant="contained" color="error" onClick={() => newPatientRef.current.close()}>
             Close
@@ -423,6 +429,7 @@ const PatientList = ({ patients, settingsInfo }) => {
 
         <Stack>
           <TextField
+            sx={{ mb: 1 }}
             type="date"
             value={dateNow}
             onChange={(e) => setDateNow(e.target.value)}
@@ -431,14 +438,26 @@ const PatientList = ({ patients, settingsInfo }) => {
           />
         </Stack>
 
-        <Stack sx={{ width: '100%', height: 150 }}>
+        {/* <Stack sx={{ width: '100%', height: 150 }}>
           <img src="../../resources/dentist.svg" alt="sample image" />
-        </Stack>
+        </Stack> */}
 
         <Stack>
-          <TextField type="text" label="Patient Name" ref={patientNameRef} className="capitalize" />
-          <TextField type="text" label="Address" ref={patientAddresRef} className="capitalize" />
-          <TextField type="number" label="Age" ref={ageRef} />
+          <TextField
+            sx={{ mb: 1 }}
+            type="text"
+            label="Patient Name"
+            ref={patientNameRef}
+            className="capitalize"
+          />
+          <TextField
+            sx={{ mb: 1 }}
+            type="text"
+            label="Address"
+            ref={patientAddresRef}
+            className="capitalize"
+          />
+          <TextField sx={{ mb: 1 }} type="number" label="Age" ref={ageRef} />
         </Stack>
 
         <Stack flexDirection={'row'} alignItems={'start'} justifyContent={'space-between'} mb={1}>
@@ -469,7 +488,7 @@ const PatientList = ({ patients, settingsInfo }) => {
             <FormHelperText>Treatment Rendered</FormHelperText>
           </FormControl>
 
-          <FormControl fullWidth sx={{ position: 'relative', zIndex: 2 }}>
+          <FormControl fullWidth sx={{ position: 'relative', zIndex: 2, mb: 1 }}>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
@@ -482,11 +501,20 @@ const PatientList = ({ patients, settingsInfo }) => {
               <MenuItem value={20}>Twenty</MenuItem>
               <MenuItem value={30}>Thirty</MenuItem> */}
 
-              {options.map((option, index) => (
-                <option key={index} value={option}>
-                  {option}
-                </option>
-              ))}
+              {options.length > 0 ? (
+                options.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value={'With Flouride'}>With Flouride</option>
+                  <option value={'Without Flouride'}>Without Flouride</option>
+                  <option value={'Medical Certificate'}>Medical Certificate</option>
+                  <option value={'Moral Band'}>Moral Band</option>
+                </>
+              )}
             </Select>
 
             <FormHelperText>Treatment Type</FormHelperText>
@@ -494,8 +522,8 @@ const PatientList = ({ patients, settingsInfo }) => {
         </Stack>
 
         <Stack>
-          <TextField type="number" label="Service Price" ref={servicePriceRef} />
-          <TextField type="number" label="Downpayment" ref={downpaymentRef} />
+          <TextField sx={{ mb: 1 }} type="number" label="Service Price" ref={servicePriceRef} />
+          <TextField sx={{ mb: 1 }} type="number" label="Downpayment" ref={downpaymentRef} />
         </Stack>
 
         <Button variant="contained" color="info" onClick={submitPatient}>
