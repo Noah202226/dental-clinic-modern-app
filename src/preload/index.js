@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { writeFileSync } from 'fs'
 
 // Custom APIs for renderer
 const api = {}
@@ -16,6 +17,8 @@ if (process.contextIsolated) {
       send: (channel, args) => ipcRenderer.send(channel, args),
       on: (channel, args) => ipcRenderer.on(channel, args)
     })
+
+    contextBridge.exposeInMainWorld('electronFs', writeFileSync)
   } catch (error) {
     console.error(error)
   }

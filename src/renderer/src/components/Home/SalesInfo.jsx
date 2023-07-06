@@ -74,10 +74,12 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
         label="Patient Name"
         value={patientName}
         onChange={(e) => setpatientName(e.target.value)}
+        InputLabelProps={{ shrink: true }}
       />
       <TextField
         type="text"
         label="Treatment Rendered"
+        InputLabelProps={{ shrink: true }}
         value={treatmentRendered}
         onChange={(e) => settreatmentRendered(e.target.value)}
       />
@@ -85,12 +87,14 @@ const SalesInfo = ({ saleTransactionRef, txID, firstDay, lastDay }) => {
         type="text"
         label="Treatment Type"
         value={treatmentType}
+        InputLabelProps={{ shrink: true }}
         onChange={(e) => settreatmentType(e.target.value)}
       />
       <TextField
         type="number"
         label="Amount"
         value={saleAmount}
+        InputLabelProps={{ shrink: true }}
         onChange={(e) => setSaleAmount(e.target.value)}
       />
 

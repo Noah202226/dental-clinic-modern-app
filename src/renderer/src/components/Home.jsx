@@ -27,7 +27,8 @@ import SalesInfo from './Home/SalesInfo'
 import { ToastContainer, toast } from 'react-toastify'
 import { CloseOutlined, DatasetLinked, ImportExport } from '@mui/icons-material'
 import Settings from './Home/Settings'
-import ExportToExcelButton from './Home/ExportToExcelButton'
+// import ExportToExcelButton from './Home/ExportToExcelButton'
+import ExcelJSButton from './Home/ExcelJS'
 
 const Home = ({ settingsInfo, userInfo }) => {
   const ipcRenderer = window.ipcRenderer
@@ -237,7 +238,9 @@ const Home = ({ settingsInfo, userInfo }) => {
         style={{ position: 'relative', zIndex: 9999999, width: '100%', height: '100%' }}
       >
         <Stack flexDirection={'row'} justifyContent={'space-between'}>
-          <Typography variant="h4">Transactions Report</Typography>
+          <Typography variant="h4" color={'indigo'} sx={{ textShadow: '2px 2px 2px cyan' }}>
+            Transaction Reports
+          </Typography>
           <Button
             variant="contained"
             color="error"
@@ -248,12 +251,18 @@ const Home = ({ settingsInfo, userInfo }) => {
           </Button>
         </Stack>
 
-        <Stack flexDirection={'row'} justifyContent={'space-between'} mt={1}>
+        <Stack
+          flexDirection={'row'}
+          justifyContent={'space-between'}
+          mt={1}
+          bgcolor={'lightblue'}
+          p={2}
+        >
           <Stack
             flexDirection={'row'}
             justifyContent={'space-between'}
             alignItems={'center'}
-            width={550}
+            width={600}
           >
             <Typography variant="h6">Date range:</Typography>
             <TextField
@@ -268,25 +277,30 @@ const Home = ({ settingsInfo, userInfo }) => {
               value={lastDayOfMonth}
               onChange={(e) => setLastDayOfMonth(e.target.value)}
             />
-            <Button variant="contained" size="small" onClick={getDataRange}>
+            <Button variant="contained" onClick={getDataRange}>
               Get Data
               <DatasetLinked />
             </Button>
           </Stack>
 
           <Stack>
-            <Button variant="contained" color="warning" onClick={notyetworking}>
-              <ImportExport />
-              Export To Excel
-            </Button>
+            {/* <ExportToExcelButton sales={filterRows} expenses={filterExpenseRows} /> */}
 
-            <ExportToExcelButton sales={filterRows} expenses={filterExpenseRows} />
+            <ExcelJSButton
+              sales={filterRows}
+              expenses={filterExpenseRows}
+              firstDay={firstDayOfMonth}
+              lastDay={lastDayOfMonth}
+            />
           </Stack>
         </Stack>
 
         <Grid container spacing={0.5}>
           <Grid item xs={7}>
-            <TableContainer component={Paper} sx={{ mt: 1, height: '100%' }}>
+            <TableContainer
+              component={Paper}
+              sx={{ mt: 1, height: '100%', backgroundColor: 'rgba(20,220,40, .2)' }}
+            >
               <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
                   <TableRow>
@@ -483,7 +497,10 @@ const Home = ({ settingsInfo, userInfo }) => {
 
           {/* Expenses */}
           <Grid item xs={5}>
-            <TableContainer component={Paper} sx={{ mt: 1, height: '100%' }}>
+            <TableContainer
+              component={Paper}
+              sx={{ mt: 1, height: '100%', backgroundColor: 'lightblue' }}
+            >
               <Table sx={{ minWidth: 50, width: '95%' }} size="small" aria-label="a dense table">
                 <TableHead>
                   <TableRow>

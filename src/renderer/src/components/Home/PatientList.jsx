@@ -417,7 +417,11 @@ const PatientList = ({ patients, settingsInfo }) => {
           zIndex: 9999999,
           width: 800,
           height: 700,
-          backgroundImage: 'url("../../resources/dentist.svg")'
+          backgroundImage: 'url("../../resources/dentist.svg")',
+          backgroundSize: '200px',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'bottom',
+          backgroundPositionX: 'right'
         }}
       >
         <Stack flexDirection={'row'} alignItems={'center'} justifyContent={'space-between'} p={1}>
